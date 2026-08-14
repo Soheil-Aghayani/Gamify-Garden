@@ -15,14 +15,21 @@ function isIosDevice(): boolean {
     || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 }
 
+function isMobileDevice(): boolean {
+  return /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent)
+    || (navigator.maxTouchPoints > 1 && window.innerWidth < 900);
+}
+
 export function useInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIos, setIsIos] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setIsInstalled(isStandaloneMode());
     setIsIos(isIosDevice());
+    setIsMobile(isMobileDevice());
 
     const handleBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
@@ -54,5 +61,6 @@ export function useInstallPrompt() {
     install,
     isInstalled,
     isIos,
+    isMobile,
   };
 }

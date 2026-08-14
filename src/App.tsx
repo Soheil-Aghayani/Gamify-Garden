@@ -271,6 +271,7 @@ export default function App() {
         <InstallPrompt
           canInstall={installPrompt.canInstall}
           isIos={installPrompt.isIos}
+          isMobile={installPrompt.isMobile}
           onInstall={handleInstall}
           onDismiss={() => setInstallDismissed(true)}
         />
