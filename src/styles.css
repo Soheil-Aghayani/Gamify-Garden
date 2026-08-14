@@ -6,6 +6,13 @@
   text-rendering: optimizeLegibility;
 }
 
+html {
+  min-width: 320px;
+  min-height: 100%;
+  background: #fff8f0;
+  overscroll-behavior: none;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -13,7 +20,10 @@
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 button,
@@ -53,13 +63,21 @@ input:focus-visible {
   --shadow: 0 24px 70px rgba(105, 77, 111, 0.12);
   position: relative;
   isolation: isolate;
-  min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom);
   overflow: hidden;
+  user-select: none;
   color: var(--ink);
   background:
     radial-gradient(circle at 8% 10%, color-mix(in srgb, var(--peach) 45%, transparent), transparent 25rem),
     radial-gradient(circle at 92% 4%, color-mix(in srgb, var(--lavender) 55%, transparent), transparent 23rem),
     var(--background);
+}
+
+.app-shell input,
+.app-shell textarea,
+.app-shell [contenteditable="true"] {
+  user-select: text;
 }
 
 .app-shell[data-palette="lilac"] {
@@ -259,6 +277,44 @@ input:focus-visible {
 
 .header-subtitle {
   margin: 0.35rem 0 0;
+}
+
+.today-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+  padding: 0.35rem 0.55rem;
+  color: var(--primary-deep);
+  background: color-mix(in srgb, var(--primary-soft) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+  border-radius: 0.9rem;
+}
+
+.today-summary__icon {
+  display: grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  color: #a67b22;
+  background: var(--sun);
+  border-radius: 0.55rem;
+  font-size: 1rem;
+}
+
+.today-summary > span:last-child {
+  display: grid;
+  gap: 0.05rem;
+}
+
+.today-summary strong {
+  color: var(--ink-strong);
+  font-size: 0.68rem;
+}
+
+.today-summary small {
+  color: var(--muted);
+  font-size: 0.58rem;
 }
 
 .inline-heart {
@@ -1038,6 +1094,17 @@ input:focus-visible {
   margin-top: 1rem;
 }
 
+.reward-rotation {
+  display: inline-flex;
+  margin-top: 0.9rem;
+  padding: 0.3rem 0.55rem;
+  color: var(--primary-deep);
+  background: var(--primary-soft);
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
 .reward-option {
   justify-content: space-between;
   gap: 0.45rem;
@@ -1073,6 +1140,83 @@ input:focus-visible {
   color: var(--muted);
   font-size: 0.7rem;
   text-align: center;
+}
+
+.install-prompt {
+  position: fixed;
+  z-index: 25;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  left: max(1rem, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: min(100% - 2rem, 31rem);
+  margin-inline: auto;
+  padding: 0.7rem 0.75rem;
+  color: var(--ink-strong);
+  background: color-mix(in srgb, var(--surface-strong) 94%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 24%, transparent);
+  border-radius: 1.2rem;
+  box-shadow: 0 18px 42px rgba(67, 52, 79, 0.16);
+  backdrop-filter: blur(16px);
+}
+
+.install-prompt__icon {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  flex: 0 0 auto;
+  color: var(--primary-deep);
+  background: var(--primary-soft);
+  border-radius: 0.75rem;
+}
+
+.install-prompt__copy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 0.12rem;
+}
+
+.install-prompt__copy strong {
+  font-size: 0.72rem;
+}
+
+.install-prompt__copy small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.6rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.install-prompt__action {
+  flex: 0 0 auto;
+  padding: 0.42rem 0.7rem;
+  color: #fffdfb;
+  background: linear-gradient(135deg, var(--primary), var(--primary-deep));
+  border: 0;
+  border-radius: 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.install-prompt__close {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: 0 0 auto;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+}
+
+.install-prompt__ios-icon {
+  flex: 0 0 auto;
+  color: var(--primary-deep);
 }
 
 .footer-leaf {
@@ -1593,6 +1737,10 @@ input:focus-visible {
     font-size: 0.72rem;
   }
 
+  .today-summary {
+    margin-top: 0.5rem;
+  }
+
   .energy-card,
   .growth-card,
   .reward-card {
@@ -1711,7 +1859,7 @@ input:focus-visible {
   }
 
   .reward-options {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .reward-option {

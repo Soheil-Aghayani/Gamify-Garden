@@ -1,5 +1,5 @@
 import { DEFAULT_TASKS } from "../data/quests";
-import { DEFAULT_REWARDS } from "../data/rewards";
+import { DEFAULT_REWARDS, REWARD_CATALOG_VERSION } from "../data/rewards";
 import { getDayKey, shiftDayKey } from "./date";
 import type {
   DailyState,
@@ -41,6 +41,7 @@ export function createInitialState(): GameState {
     plantStage: "seed",
     hasSeenIntro: false,
     rewards: [...DEFAULT_REWARDS],
+    rewardCatalogVersion: REWARD_CATALOG_VERSION,
   };
 }
 
@@ -50,6 +51,24 @@ export function getDayState(state: GameState, dayKey = getDayKey()): DailyState 
 
 export function getDailyTarget(state: GameState): number {
   return Math.min(DAILY_TARGET, state.tasks.length);
+}
+
+function hashValue(value: string): number {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = ((hash << 5) - hash + value.charCodeAt(index)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+export function getDailyRewardOptions(
+  rewards: readonly string[],
+  dayKey = getDayKey(),
+  limit = 5,
+): string[] {
+  return [...rewards]
+    .sort((left, right) => hashValue(`${dayKey}:${left}`) - hashValue(`${dayKey}:${right}`))
+    .slice(0, Math.min(limit, rewards.length));
 }
 
 export function getFlowStep(state: GameState, dayKey = getDayKey()): FlowStep {

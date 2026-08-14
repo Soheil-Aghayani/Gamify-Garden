@@ -1,6 +1,7 @@
 import { Check, Sparkles } from "lucide-react";
 import type { CSSProperties } from "react";
 import { getDailyPlantStage } from "../lib/game";
+import type { AvatarVariant } from "../lib/avatar";
 import { toPersianDigits, toPersianPercent } from "../lib/format";
 import type { PaletteId, PlantStage } from "../types/game";
 import { ApricityAvatar } from "./ApricityAvatar";
@@ -11,6 +12,7 @@ interface GrowthSceneProps {
   target: number;
   totalWins: number;
   avatarSeed: string;
+  avatarVariant: AvatarVariant;
   palette: PaletteId;
 }
 
@@ -21,7 +23,7 @@ const STAGE_LABELS: Record<PlantStage, string> = {
   tree: "درخت",
 };
 
-export function GrowthScene({ completedCount, target, totalWins, avatarSeed, palette }: GrowthSceneProps) {
+export function GrowthScene({ completedCount, target, totalWins, avatarSeed, avatarVariant, palette }: GrowthSceneProps) {
   const stage = getDailyPlantStage(completedCount, target);
   const progress = target === 0 ? 0 : Math.min(100, Math.round((completedCount / target) * 100));
   const isComplete = target > 0 && completedCount >= target;
@@ -42,7 +44,7 @@ export function GrowthScene({ completedCount, target, totalWins, avatarSeed, pal
       <div className="growth-card__copy">
         <div className="growth-card__topline">
           <span className="tiny-badge tiny-badge--warm"><Sparkles size={13} /> مرحله‌ی امروز</span>
-          <ApricityAvatar seed={avatarSeed} palette={palette} stage={stage} size={54} label="Apricity کنار باغ" />
+          <ApricityAvatar seed={avatarSeed} variant={avatarVariant} palette={palette} stage={stage} size={54} label="آواتار امروز Apricity کنار باغ" />
         </div>
         <h2 id="growth-title">باغت آرام‌آرام رشد می‌کند</h2>
         <p>{message}</p>

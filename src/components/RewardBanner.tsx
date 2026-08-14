@@ -1,10 +1,12 @@
 import { Check, Gift, Heart, Sparkles } from "lucide-react";
 import type { Ref } from "react";
 import { toPersianDigits } from "../lib/format";
+import { getDailyRewardOptions } from "../lib/game";
 
 interface RewardBannerProps {
   dailyWin: boolean;
   target: number;
+  dayKey: string;
   rewards: readonly string[];
   selectedReward?: string;
   isNext: boolean;
@@ -12,9 +14,13 @@ interface RewardBannerProps {
   onChoose: (reward: string) => void;
 }
 
-export function RewardBanner({ dailyWin, target, rewards, selectedReward, isNext, sectionRef, onChoose }: RewardBannerProps) {
+export function RewardBanner({ dailyWin, target, dayKey, rewards, selectedReward, isNext, sectionRef, onChoose }: RewardBannerProps) {
   const emptyGarden = target === 0;
   const isDone = dailyWin && Boolean(selectedReward);
+  const dailyRewards = getDailyRewardOptions(rewards, dayKey);
+  const visibleRewards = selectedReward && !dailyRewards.includes(selectedReward)
+    ? [selectedReward, ...dailyRewards].slice(0, 5)
+    : dailyRewards;
   return (
     <section
       ref={sectionRef}
@@ -30,8 +36,10 @@ export function RewardBanner({ dailyWin, target, rewards, selectedReward, isNext
         <h2 id="reward-title">{isDone ? "امروز همین‌قدر کافی بود 🌤️" : dailyWin ? "امروز را بردی ✨" : emptyGarden ? "اول یک کار به باغ اضافه کن" : `${toPersianDigits(target)} قدم، یک جایزه‌ی کوچیک`}</h2>
         <p>{isDone ? `انتخابت: ${selectedReward}` : dailyWin ? "یکی را برای خودت انتخاب کن؛ واقعاً حقته." : emptyGarden ? "هر چیزی که دوست داری می‌تواند اولین جوانه باشد." : "لازم نیست بزرگ باشد؛ فقط چیزی که حالت را خوب کند."}</p>
         {dailyWin && (
-          <div className="reward-options" role="group" aria-label="انتخاب جایزه">
-            {rewards.map((reward) => {
+          <>
+            <span className="reward-rotation">پیشنهادهای امروز 🌼</span>
+            <div className="reward-options" role="group" aria-label="انتخاب جایزه">
+            {visibleRewards.map((reward) => {
               const selected = reward === selectedReward;
               return (
                 <button
@@ -46,7 +54,8 @@ export function RewardBanner({ dailyWin, target, rewards, selectedReward, isNext
                 </button>
               );
             })}
-          </div>
+            </div>
+          </>
         )}
       </div>
     </section>

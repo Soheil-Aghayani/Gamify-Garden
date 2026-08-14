@@ -1,4 +1,5 @@
 import { BookOpen, Heart, Settings2, Sparkles, Trophy } from "lucide-react";
+import type { AvatarVariant } from "../lib/avatar";
 import type { PaletteId, PlantStage } from "../types/game";
 import { toPersianDigits } from "../lib/format";
 import { ApricityAvatar } from "./ApricityAvatar";
@@ -7,10 +8,13 @@ interface GardenHeaderProps {
   displayName: string;
   nickname: string;
   avatarSeed: string;
+  avatarVariant: AvatarVariant;
   palette: PaletteId;
   plantStage: PlantStage;
   totalWins: number;
   gentleStreak: number;
+  todayWeekday: string;
+  todayDate: string;
   onGuide: () => void;
   onSettings: () => void;
 }
@@ -19,10 +23,13 @@ export function GardenHeader({
   displayName,
   nickname,
   avatarSeed,
+  avatarVariant,
   palette,
   plantStage,
   totalWins,
   gentleStreak,
+  todayWeekday,
+  todayDate,
   onGuide,
   onSettings,
 }: GardenHeaderProps) {
@@ -30,12 +37,19 @@ export function GardenHeader({
     <header className="garden-header">
       <div className="garden-header__main">
         <div className="brand-mark brand-mark--avatar">
-          <ApricityAvatar seed={avatarSeed} palette={palette} stage={plantStage} size={54} />
+          <ApricityAvatar seed={avatarSeed} variant={avatarVariant} palette={palette} stage={plantStage} size={54} label="آواتار امروز فاطمه" />
         </div>
         <div>
           <p className="eyebrow">سلام، {displayName} <Heart className="inline-heart" size={14} fill="currentColor" /></p>
           <h1>{nickname}</h1>
           <p className="header-subtitle">گرمای آفتاب در روزهای سرد.</p>
+          <div className="today-summary" aria-label={`امروز ${todayWeekday}، ${todayDate}`}>
+            <span className="today-summary__icon" aria-hidden="true">☼</span>
+            <span>
+              <strong>{todayWeekday}</strong>
+              <small>{todayDate}</small>
+            </span>
+          </div>
         </div>
       </div>
 

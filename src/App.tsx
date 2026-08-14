@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { getDayKey } from "./lib/date";
+import { getDailyAvatar } from "./lib/avatar";
+import { getDayKey, getPersianDateSummary } from "./lib/date";
 import { toPersianDigits } from "./lib/format";
 import {
   addTask,
@@ -22,11 +23,13 @@ import { EnergyPicker } from "./components/EnergyPicker";
 import { GardenHeader } from "./components/GardenHeader";
 import { GrowthScene } from "./components/GrowthScene";
 import { GuideDrawer } from "./components/GuideDrawer";
+import { InstallPrompt } from "./components/InstallPrompt";
 import { QuestGrid } from "./components/QuestGrid";
 import { RewardBanner } from "./components/RewardBanner";
 import { SettingsDrawer } from "./components/SettingsDrawer";
 import { TaskManagerDrawer } from "./components/TaskManagerDrawer";
 import { WeekMemory } from "./components/WeekMemory";
+import { useInstallPrompt } from "./hooks/useInstallPrompt";
 import "./styles.css";
 
 interface ToastAction {
@@ -44,16 +47,20 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [taskManagerOpen, setTaskManagerOpen] = useState(false);
+  const [installDismissed, setInstallDismissed] = useState(false);
+  const [todayKey, setTodayKey] = useState(() => getDayKey());
   const [toast, setToast] = useState<ToastState | null>(null);
   const toastTimer = useRef<number | undefined>(undefined);
   const energyRef = useRef<HTMLElement | null>(null);
   const questsRef = useRef<HTMLElement | null>(null);
   const rewardRef = useRef<HTMLElement | null>(null);
   const previousFlowStep = useRef<FlowStep | null>(null);
-  const todayKey = getDayKey();
   const today = getDayState(gameState, todayKey);
   const target = getDailyTarget(gameState);
   const flowStep = getFlowStep(gameState, todayKey);
+  const todaySummary = getPersianDateSummary();
+  const dailyAvatar = getDailyAvatar(gameState.profile.avatarSeed, todayKey);
+  const installPrompt = useInstallPrompt();
 
   useEffect(() => {
     saveGameState(gameState);
@@ -69,6 +76,14 @@ export default function App() {
     return () => {
       if (toastTimer.current) window.clearTimeout(toastTimer.current);
     };
+  }, []);
+
+  useEffect(() => {
+    const dayTimer = window.setInterval(() => {
+      const nextDayKey = getDayKey();
+      setTodayKey((currentDayKey) => currentDayKey === nextDayKey ? currentDayKey : nextDayKey);
+    }, 60_000);
+    return () => window.clearInterval(dayTimer);
   }, []);
 
   useEffect(() => {
@@ -96,6 +111,11 @@ export default function App() {
     setToast({ message, action });
     if (toastTimer.current) window.clearTimeout(toastTimer.current);
     toastTimer.current = window.setTimeout(() => setToast(null), action ? 5000 : 2600);
+  };
+
+  const handleInstall = async () => {
+    const accepted = await installPrompt.install();
+    if (accepted) showToast("باغت روی گوشی‌ات نشست 🌱");
   };
 
   const handleGuideClose = () => {
@@ -168,18 +188,32 @@ export default function App() {
   };
 
   return (
-    <div className="app-shell" data-palette={gameState.profile.palette}>
+    <div
+      className="app-shell"
+      data-palette={gameState.profile.palette}
+      onContextMenu={(event) => {
+        const target = event.target as HTMLElement;
+        if (!target.closest("input, textarea, [contenteditable='true']")) event.preventDefault();
+      }}
+      onDragStart={(event) => {
+        const target = event.target as HTMLElement;
+        if (!target.closest("input, textarea, [contenteditable='true']")) event.preventDefault();
+      }}
+    >
       <div className="background-orb background-orb--one" aria-hidden="true" />
       <div className="background-orb background-orb--two" aria-hidden="true" />
       <main className="page-shell">
         <GardenHeader
           displayName={gameState.profile.displayName}
           nickname={gameState.profile.nickname}
-          avatarSeed={gameState.profile.avatarSeed}
+          avatarSeed={dailyAvatar.seed}
+          avatarVariant={dailyAvatar.variant}
           palette={gameState.profile.palette}
           plantStage={gameState.plantStage}
           totalWins={gameState.totalWins}
           gentleStreak={gameState.gentleStreak}
+          todayWeekday={todaySummary.weekday}
+          todayDate={todaySummary.date}
           onGuide={() => setGuideOpen(true)}
           onSettings={() => setSettingsOpen(true)}
         />
@@ -196,7 +230,8 @@ export default function App() {
             completedCount={today.completedQuestIds.length}
             target={target}
             totalWins={gameState.totalWins}
-            avatarSeed={gameState.profile.avatarSeed}
+            avatarSeed={dailyAvatar.seed}
+            avatarVariant={dailyAvatar.variant}
             palette={gameState.profile.palette}
           />
           <WeekMemory days={gameState.days} todayKey={todayKey} />
@@ -213,6 +248,7 @@ export default function App() {
           <RewardBanner
             dailyWin={today.dailyWin}
             target={target}
+            dayKey={todayKey}
             rewards={gameState.rewards}
             selectedReward={today.rewardChoice}
             isNext={flowStep === "reward"}
@@ -221,11 +257,20 @@ export default function App() {
           />
         </div>
 
-        <footer className="page-footer">
+      <footer className="page-footer">
           <span className="footer-leaf" aria-hidden="true">✦</span>
           <span>Apricity؛ گرمای کوچکی برای روزهای سرد.</span>
         </footer>
       </main>
+
+      {!installDismissed && !installPrompt.isInstalled && (
+        <InstallPrompt
+          canInstall={installPrompt.canInstall}
+          isIos={installPrompt.isIos}
+          onInstall={handleInstall}
+          onDismiss={() => setInstallDismissed(true)}
+        />
+      )}
 
       <GuideDrawer open={guideOpen} onClose={handleGuideClose} />
       <SettingsDrawer

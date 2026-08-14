@@ -54,4 +54,5 @@ export interface GameState {
   plantStage: PlantStage;
   hasSeenIntro: boolean;
   rewards: string[];
+  rewardCatalogVersion: number;
 }

@@ -1,5 +1,5 @@
 import { DEFAULT_TASKS } from "../data/quests";
-import { DEFAULT_REWARDS } from "../data/rewards";
+import { DEFAULT_REWARDS, REWARD_CATALOG_VERSION } from "../data/rewards";
 import { createInitialState, recalculateStats } from "./game";
 import type { DailyState, GameState, PaletteId, QuestId, TaskDefinition, TaskIconKey } from "../types/game";
 
@@ -89,6 +89,7 @@ function normalizeState(value: unknown): GameState {
 
   const candidate = value as Partial<GameState> & {
     profile?: Partial<GameState["profile"]>;
+    rewardCatalogVersion?: number;
   };
 
   const rawTasks = Array.isArray(candidate.tasks) ? candidate.tasks : DEFAULT_TASKS;
@@ -112,13 +113,16 @@ function normalizeState(value: unknown): GameState {
   const avatarSeed = typeof candidate.profile?.avatarSeed === "string" && candidate.profile.avatarSeed.trim()
     ? candidate.profile.avatarSeed.trim().slice(0, 80)
     : initial.profile.avatarSeed;
-  const rewards = Array.isArray(candidate.rewards)
+  const savedRewards = Array.isArray(candidate.rewards)
     ? candidate.rewards.filter((reward): reward is string => typeof reward === "string")
       .map((reward) => reward.trim().slice(0, 42))
       .filter(Boolean)
       .filter((reward, index, list) => list.indexOf(reward) === index)
-      .slice(0, 20)
-    : [...DEFAULT_REWARDS];
+    : [];
+  const rewards = (candidate.rewardCatalogVersion === REWARD_CATALOG_VERSION
+    ? savedRewards
+    : [...DEFAULT_REWARDS, ...savedRewards]
+  ).filter((reward, index, list) => list.indexOf(reward) === index).slice(0, 20);
 
   return recalculateStats({
     ...initial,
@@ -135,6 +139,7 @@ function normalizeState(value: unknown): GameState {
     days,
     hasSeenIntro: typeof candidate.hasSeenIntro === "boolean" ? candidate.hasSeenIntro : true,
     rewards: rewards.length > 0 ? rewards : [...DEFAULT_REWARDS],
+    rewardCatalogVersion: REWARD_CATALOG_VERSION,
   });
 }
 

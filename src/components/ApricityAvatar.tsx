@@ -1,4 +1,5 @@
 import Avatar from "boring-avatars";
+import type { AvatarVariant } from "../lib/avatar";
 import type { PaletteId, PlantStage } from "../types/game";
 
 const AVATAR_COLORS: Record<PaletteId, string[]> = {
@@ -11,17 +12,18 @@ interface ApricityAvatarProps {
   seed: string;
   palette: PaletteId;
   stage: PlantStage;
+  variant?: AvatarVariant;
   size?: number;
   label?: string;
 }
 
-export function ApricityAvatar({ seed, palette, stage, size = 64, label = "آواتار فاطمه" }: ApricityAvatarProps) {
+export function ApricityAvatar({ seed, palette, stage, variant = "beam", size = 64, label = "آواتار فاطمه" }: ApricityAvatarProps) {
   return (
     <span className={`apricity-avatar apricity-avatar--${stage}`} role="img" aria-label={label}>
       <span className="apricity-avatar__halo" aria-hidden="true" />
       <Avatar
         name={seed}
-        variant="beam"
+        variant={variant}
         colors={AVATAR_COLORS[palette]}
         size={size}
         title

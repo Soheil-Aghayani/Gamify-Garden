@@ -51,10 +51,11 @@ Apricity یعنی **گرمای نور خورشید در زمستان**؛ هما�
 | 🪴 صحنه‌ی رشد | دانه، جوانه، گل و درخت کوچک؛ پیشرفتت فقط عدد نیست و دیده می‌شود. |
 | 🧩 تسک‌های قابل‌تغییر | کارهای آماده را کم‌وزیاد کن یا یک کار شخصی با عنوان، توضیح و آیکون بساز. |
 | ↩️ حذفِ قابل‌برگشت | اگر تسکی را اشتباهی حذف کردی، چند ثانیه فرصت Undo داری. |
-| 🎁 جایزه‌های خودت | جایزه‌هایی مثل چای، سریال، موسیقی یا یک پیام اختصاصی اضافه کن. |
-| 🪩 آواتار Apricity | آواتار SVG چهره‌دار فاطمه با variant `beam`، seed ثابت و [Boring Avatars](https://github.com/boringdesigners/boring-avatars) ساخته می‌شود. |
+| 🎁 جایزه‌های هر روز | کتابخانه‌ی جایزه‌ها متنوع است و هر روز چند پیشنهاد تازه و deterministic نشان می‌دهد؛ جایزه‌ی شخصی هم می‌توانی اضافه کنی. |
+| 🪩 آواتار Apricity | آواتار SVG روزانه‌ی فاطمه با seed و variant متغیر و [Boring Avatars](https://github.com/boringdesigners/boring-avatars) ساخته می‌شود. |
+| 🗓️ تقویم باغ | امروز را با تاریخ شمسی و نام روز هفته می‌بینی تا باغ حس روزانه‌تری داشته باشد. |
 | 🌼 یادگار هفته | گل‌های هفت روز اخیر را می‌بینی؛ بدون امتیاز منفی و بدون فشار استریک. |
-| 📱 آماده‌ی موبایل | فارسی، راست‌به‌چپ، واکنش‌گرا و قابل نصب به‌شکل PWA. |
+| 📱 حس اپ واقعی | PWA با حالت standalone، safe area، install prompt، آیکون نصب و cache آفلاین. |
 
 ## 🎨 حال‌وهوای بصری
 
@@ -89,6 +90,9 @@ npm run build
 |---|---|
 | [`src/App.tsx`](src/App.tsx) | حلقه‌ی اصلی flow و وضعیت روز |
 | [`src/components/ApricityAvatar.tsx`](src/components/ApricityAvatar.tsx) | آواتار SVG فاطمه |
+| [`src/lib/avatar.ts`](src/lib/avatar.ts) | آواتار deterministic هر روز |
+| [`src/lib/date.ts`](src/lib/date.ts) | تاریخ شمسی و روز هفته |
+| [`src/components/InstallPrompt.tsx`](src/components/InstallPrompt.tsx) | پیشنهاد نصب روی گوشی |
 | [`src/components/GrowthScene.tsx`](src/components/GrowthScene.tsx) | صحنه‌ی رشد گیاه و حلقه‌ی پیشرفت |
 | [`src/components/TaskManagerDrawer.tsx`](src/components/TaskManagerDrawer.tsx) | اضافه، کم و مدیریت‌کردن تسک‌ها |
 | [`src/components/WeekMemory.tsx`](src/components/WeekMemory.tsx) | یادگار آرام هفت روز اخیر |
@@ -111,6 +115,7 @@ npm run build
 
 - هیچ حساب کاربری، API خارجی یا بک‌اندی وجود ندارد.
 - پیشرفت با کلید `gamify-garden:v1` فقط در `localStorage` همان مرورگر نگه‌داری می‌شود.
+- بعد از نصب، باغ با manifest و service worker در حالت standalone و تا حد امکان آفلاین کار می‌کند.
 - از دست‌دادن یک روز، سطح یا پیشرفت قبلی را پاک نمی‌کند.
 - انیمیشن‌ها به تنظیم `prefers-reduced-motion` احترام می‌گذارند.
 
