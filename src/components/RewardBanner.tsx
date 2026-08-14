@@ -1,32 +1,36 @@
 import { Check, Gift, Heart, Sparkles } from "lucide-react";
+import type { Ref } from "react";
 
 interface RewardBannerProps {
   dailyWin: boolean;
   target: number;
+  rewards: readonly string[];
   selectedReward?: string;
+  isNext: boolean;
+  sectionRef?: Ref<HTMLElement>;
   onChoose: (reward: string) => void;
 }
 
-const REWARDS = [
-  "یک نوشیدنی خوشمزه",
-  "یک قسمت سریال",
-  "یک بغل و قدم‌زدن",
-];
-
-export function RewardBanner({ dailyWin, target, selectedReward, onChoose }: RewardBannerProps) {
+export function RewardBanner({ dailyWin, target, rewards, selectedReward, isNext, sectionRef, onChoose }: RewardBannerProps) {
   const emptyGarden = target === 0;
+  const isDone = dailyWin && Boolean(selectedReward);
   return (
-    <section className={`reward-card soft-card${dailyWin ? " is-unlocked" : ""}`} aria-labelledby="reward-title">
+    <section
+      ref={sectionRef}
+      tabIndex={-1}
+      className={`reward-card soft-card${dailyWin ? " is-unlocked" : ""}${isNext ? " is-flow-next" : ""}${isDone ? " is-done" : ""}`}
+      aria-labelledby="reward-title"
+    >
       <div className="reward-card__icon" aria-hidden="true">
         {dailyWin ? <Gift size={24} strokeWidth={1.8} /> : <Sparkles size={22} strokeWidth={1.8} />}
       </div>
       <div className="reward-card__content">
         <p className="eyebrow">جایزه‌ی مهربانانه</p>
-        <h2 id="reward-title">{dailyWin ? "امروز را بردی ✨" : emptyGarden ? "اول یک کار به باغ اضافه کن" : `${target} قدم، یک جایزه‌ی کوچیک`}</h2>
-        <p>{dailyWin ? "یکی را برای خودت انتخاب کن؛ واقعاً حقته." : emptyGarden ? "هر چیزی که دوست داری می‌تواند اولین جوانه باشد." : "لازم نیست بزرگ باشد؛ فقط چیزی که حالت را خوب کند."}</p>
+        <h2 id="reward-title">{isDone ? "امروز همین‌قدر کافی بود 🌤️" : dailyWin ? "امروز را بردی ✨" : emptyGarden ? "اول یک کار به باغ اضافه کن" : `${target} قدم، یک جایزه‌ی کوچیک`}</h2>
+        <p>{isDone ? `انتخابت: ${selectedReward}` : dailyWin ? "یکی را برای خودت انتخاب کن؛ واقعاً حقته." : emptyGarden ? "هر چیزی که دوست داری می‌تواند اولین جوانه باشد." : "لازم نیست بزرگ باشد؛ فقط چیزی که حالت را خوب کند."}</p>
         {dailyWin && (
           <div className="reward-options" role="group" aria-label="انتخاب جایزه">
-            {REWARDS.map((reward) => {
+            {rewards.map((reward) => {
               const selected = reward === selectedReward;
               return (
                 <button

@@ -1,4 +1,5 @@
 import { DEFAULT_TASKS } from "../data/quests";
+import { DEFAULT_REWARDS } from "../data/rewards";
 import { createInitialState, recalculateStats } from "./game";
 import type { DailyState, GameState, PaletteId, QuestId, TaskDefinition, TaskIconKey } from "../types/game";
 
@@ -75,6 +76,7 @@ function normalizeDay(dayKey: string, value: unknown, tasks: TaskDefinition[]): 
   return {
     dayKey,
     energy,
+    energyConfirmed: typeof candidate.energyConfirmed === "boolean" ? candidate.energyConfirmed : true,
     completedQuestIds,
     dailyWin,
     rewardChoice: dailyWin && typeof candidate.rewardChoice === "string" ? candidate.rewardChoice.slice(0, 80) : undefined,
@@ -107,6 +109,16 @@ function normalizeState(value: unknown): GameState {
 
   const savedName = typeof candidate.profile?.displayName === "string" ? candidate.profile.displayName.trim() : "";
   const displayName = savedName && savedName !== "دوست من" ? savedName.slice(0, 24) : initial.profile.displayName;
+  const avatarSeed = typeof candidate.profile?.avatarSeed === "string" && candidate.profile.avatarSeed.trim()
+    ? candidate.profile.avatarSeed.trim().slice(0, 80)
+    : initial.profile.avatarSeed;
+  const rewards = Array.isArray(candidate.rewards)
+    ? candidate.rewards.filter((reward): reward is string => typeof reward === "string")
+      .map((reward) => reward.trim().slice(0, 42))
+      .filter(Boolean)
+      .filter((reward, index, list) => list.indexOf(reward) === index)
+      .slice(0, 20)
+    : [...DEFAULT_REWARDS];
 
   return recalculateStats({
     ...initial,
@@ -116,10 +128,13 @@ function normalizeState(value: unknown): GameState {
         typeof candidate.profile?.nickname === "string" && candidate.profile.nickname.trim()
           ? candidate.profile.nickname.trim().slice(0, 24)
           : initial.profile.nickname,
+      avatarSeed,
       palette: isPalette(candidate.profile?.palette) ? candidate.profile.palette : initial.profile.palette,
     },
     tasks: safeTasks,
     days,
+    hasSeenIntro: typeof candidate.hasSeenIntro === "boolean" ? candidate.hasSeenIntro : true,
+    rewards: rewards.length > 0 ? rewards : [...DEFAULT_REWARDS],
   });
 }
 

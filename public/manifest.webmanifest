@@ -1,0 +1,19 @@
+{
+  "name": "Apricity | باغ قدم‌های کوچک",
+  "short_name": "Apricity",
+  "description": "یک باغ کوچک برای قدم‌های کوچک روزانه",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fff8f0",
+  "theme_color": "#fff8f0",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

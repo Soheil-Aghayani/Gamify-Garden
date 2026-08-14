@@ -1,8 +1,10 @@
 import { DEFAULT_TASKS } from "../data/quests";
+import { DEFAULT_REWARDS } from "../data/rewards";
 import { getDayKey, shiftDayKey } from "./date";
 import type {
   DailyState,
   EnergyLevel,
+  FlowStep,
   GameState,
   PlantStage,
   Profile,
@@ -15,6 +17,7 @@ export const DAILY_TARGET = 3;
 export const DEFAULT_PROFILE: Profile = {
   displayName: "فاطمه",
   nickname: "Apricity",
+  avatarSeed: "fatemeh-apricity",
   palette: "mint",
 };
 
@@ -22,6 +25,7 @@ export function createEmptyDay(dayKey = getDayKey()): DailyState {
   return {
     dayKey,
     energy: 1,
+    energyConfirmed: false,
     completedQuestIds: [],
     dailyWin: false,
   };
@@ -35,6 +39,8 @@ export function createInitialState(): GameState {
     totalWins: 0,
     gentleStreak: 0,
     plantStage: "seed",
+    hasSeenIntro: false,
+    rewards: [...DEFAULT_REWARDS],
   };
 }
 
@@ -44,6 +50,17 @@ export function getDayState(state: GameState, dayKey = getDayKey()): DailyState 
 
 export function getDailyTarget(state: GameState): number {
   return Math.min(DAILY_TARGET, state.tasks.length);
+}
+
+export function getFlowStep(state: GameState, dayKey = getDayKey()): FlowStep {
+  const day = getDayState(state, dayKey);
+  const target = getDailyTarget(state);
+
+  if (!state.hasSeenIntro) return "intro";
+  if (target === 0) return "manage";
+  if (!day.energyConfirmed) return "energy";
+  if (day.dailyWin) return day.rewardChoice ? "done" : "reward";
+  return "tasks";
 }
 
 export function isDailyWin(completedCount: number, target: number): boolean {
@@ -156,6 +173,38 @@ export function addTask(state: GameState, task: TaskDefinition): GameState {
   };
 }
 
+export function addReward(state: GameState, reward: string): GameState {
+  const cleanReward = reward.trim().slice(0, 42);
+  if (!cleanReward || state.rewards.includes(cleanReward)) return state;
+  return { ...state, rewards: [...state.rewards, cleanReward] };
+}
+
+export function removeReward(state: GameState, reward: string): GameState {
+  if (state.rewards.length <= 1) return state;
+  return { ...state, rewards: state.rewards.filter((item) => item !== reward) };
+}
+
+export function restoreTask(
+  state: GameState,
+  task: TaskDefinition,
+  completedBeforeRemoval: Record<string, boolean>,
+): GameState {
+  if (state.tasks.some((item) => item.id === task.id)) return state;
+  const tasks = [...state.tasks, task];
+  const target = Math.min(DAILY_TARGET, tasks.length);
+  const days = Object.fromEntries(
+    Object.entries(state.days).map(([dayKey, day]) => {
+      const completedQuestIds = completedBeforeRemoval[dayKey] && !day.completedQuestIds.includes(task.id)
+        ? [...day.completedQuestIds, task.id]
+        : day.completedQuestIds;
+      const dailyWin = isDailyWin(completedQuestIds.length, target);
+      return [dayKey, { ...day, completedQuestIds, dailyWin, rewardChoice: dailyWin ? day.rewardChoice : undefined }];
+    }),
+  );
+
+  return recalculateStats({ ...state, tasks, days });
+}
+
 export function removeTask(state: GameState, taskId: QuestId): GameState {
   const tasks = state.tasks.filter((task) => task.id !== taskId);
   const target = Math.min(DAILY_TARGET, tasks.length);
@@ -175,7 +224,11 @@ export function setTodayEnergy(
   energy: EnergyLevel,
   dayKey = getDayKey(),
 ): GameState {
-  return updateToday(state, (day) => ({ ...day, energy }), dayKey);
+  return updateToday(state, (day) => ({ ...day, energy, energyConfirmed: true }), dayKey);
+}
+
+export function markIntroSeen(state: GameState): GameState {
+  return { ...state, hasSeenIntro: true };
 }
 
 export function setTodayReward(

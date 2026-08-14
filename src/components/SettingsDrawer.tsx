@@ -1,12 +1,15 @@
-import { Check, Palette, Settings2, X } from "lucide-react";
+import { Check, Palette, Plus, Settings2, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { PaletteId, Profile } from "../types/game";
 
 interface SettingsDrawerProps {
   open: boolean;
   profile: Profile;
+  rewards: readonly string[];
   onClose: () => void;
   onSave: (profile: Profile) => void;
+  onAddReward: (reward: string) => void;
+  onRemoveReward: (reward: string) => void;
 }
 
 const PALETTES: Array<{ id: PaletteId; label: string; colors: string[] }> = [
@@ -15,16 +18,18 @@ const PALETTES: Array<{ id: PaletteId; label: string; colors: string[] }> = [
   { id: "peach", label: "هلویی", colors: ["#ffc8b6", "#ffe3b9", "#c7e9dc"] },
 ];
 
-export function SettingsDrawer({ open, profile, onClose, onSave }: SettingsDrawerProps) {
+export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddReward, onRemoveReward }: SettingsDrawerProps) {
   const [draftName, setDraftName] = useState(profile.displayName);
   const [draftNickname, setDraftNickname] = useState(profile.nickname);
   const [draftPalette, setDraftPalette] = useState<PaletteId>(profile.palette);
+  const [draftReward, setDraftReward] = useState("");
 
   useEffect(() => {
     if (open) {
       setDraftName(profile.displayName);
       setDraftNickname(profile.nickname);
       setDraftPalette(profile.palette);
+      setDraftReward("");
     }
   }, [open, profile.displayName, profile.nickname, profile.palette]);
 
@@ -43,9 +48,17 @@ export function SettingsDrawer({ open, profile, onClose, onSave }: SettingsDrawe
     onSave({
       displayName: draftName.trim() || "فاطمه",
       nickname: draftNickname.trim() || "Apricity",
+      avatarSeed: profile.avatarSeed,
       palette: draftPalette,
     });
     onClose();
+  };
+
+  const addReward = () => {
+    const cleanReward = draftReward.trim();
+    if (!cleanReward) return;
+    onAddReward(cleanReward);
+    setDraftReward("");
   };
 
   return (
@@ -112,8 +125,49 @@ export function SettingsDrawer({ open, profile, onClose, onSave }: SettingsDrawe
           })}
         </div>
 
+        <div className="settings-divider" />
+        <div className="field-label"><HeartIcon /> جایزه‌های مهربانانه</div>
+        <p className="settings-hint">چیزهای کوچیکی که بعد از سه قدم حالت را خوب می‌کنند.</p>
+        <div className="reward-manager">
+          <div className="reward-manager__input">
+            <input
+              id="custom-reward"
+              className="text-input"
+              value={draftReward}
+              onChange={(event) => setDraftReward(event.target.value)}
+              onKeyDown={(event) => { if (event.key === "Enter") addReward(); }}
+              placeholder="مثلاً: چای و موسیقی"
+              maxLength={42}
+              autoComplete="off"
+            />
+            <button type="button" className="icon-button icon-button--small" onClick={addReward} disabled={!draftReward.trim()} aria-label="اضافه‌کردن جایزه">
+              <Plus size={17} />
+            </button>
+          </div>
+          <div className="reward-manager__list">
+            {rewards.map((reward) => (
+              <div className="reward-manager__item" key={reward}>
+                <span>{reward}</span>
+                <button
+                  type="button"
+                  className="delete-button"
+                  onClick={() => onRemoveReward(reward)}
+                  disabled={rewards.length <= 1}
+                  aria-label={`حذف جایزه ${reward}`}
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <button type="button" className="primary-button drawer-save" onClick={save}>ذخیره‌ی تغییرات</button>
       </aside>
     </div>
   );
+}
+
+function HeartIcon() {
+  return <span aria-hidden="true">♡</span>;
 }

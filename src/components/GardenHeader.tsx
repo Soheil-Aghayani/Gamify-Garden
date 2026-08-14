@@ -1,8 +1,13 @@
 import { BookOpen, Heart, Settings2, Sparkles, Trophy } from "lucide-react";
+import type { PaletteId, PlantStage } from "../types/game";
+import { ApricityAvatar } from "./ApricityAvatar";
 
 interface GardenHeaderProps {
   displayName: string;
   nickname: string;
+  avatarSeed: string;
+  palette: PaletteId;
+  plantStage: PlantStage;
   totalWins: number;
   gentleStreak: number;
   onGuide: () => void;
@@ -12,6 +17,9 @@ interface GardenHeaderProps {
 export function GardenHeader({
   displayName,
   nickname,
+  avatarSeed,
+  palette,
+  plantStage,
   totalWins,
   gentleStreak,
   onGuide,
@@ -20,8 +28,8 @@ export function GardenHeader({
   return (
     <header className="garden-header">
       <div className="garden-header__main">
-        <div className="brand-mark" aria-hidden="true">
-          <Sparkles size={22} strokeWidth={1.8} />
+        <div className="brand-mark brand-mark--avatar">
+          <ApricityAvatar seed={avatarSeed} palette={palette} stage={plantStage} size={54} />
         </div>
         <div>
           <p className="eyebrow">سلام، {displayName} <Heart className="inline-heart" size={14} fill="currentColor" /></p>

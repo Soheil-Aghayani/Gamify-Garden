@@ -164,6 +164,71 @@ input:focus-visible {
   transform: rotate(-5deg);
 }
 
+.brand-mark--avatar {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.apricity-avatar {
+  position: relative;
+  display: inline-flex;
+  place-items: center;
+  flex: 0 0 auto;
+  isolation: isolate;
+}
+
+.apricity-avatar svg {
+  position: relative;
+  z-index: 1;
+  display: block;
+  border: 0.2rem solid color-mix(in srgb, var(--surface-strong) 86%, transparent);
+  border-radius: 50%;
+  box-shadow: 0 0.45rem 1rem rgba(105, 77, 111, 0.14);
+}
+
+.apricity-avatar__halo {
+  position: absolute;
+  z-index: -1;
+  inset: 7%;
+  border: 0.35rem solid color-mix(in srgb, var(--primary) 25%, transparent);
+  border-radius: 50%;
+  transform: scale(1.16);
+  transition: border-color 320ms ease, transform 320ms ease;
+}
+
+.apricity-avatar--sprout .apricity-avatar__halo {
+  border-color: color-mix(in srgb, var(--primary) 42%, transparent);
+  transform: scale(1.19);
+}
+
+.apricity-avatar--flower .apricity-avatar__halo,
+.apricity-avatar--tree .apricity-avatar__halo {
+  border-color: color-mix(in srgb, var(--sun) 72%, transparent);
+  box-shadow: 0 0 1.15rem color-mix(in srgb, var(--sun) 52%, transparent);
+  transform: scale(1.23);
+}
+
+.apricity-avatar__spark {
+  position: absolute;
+  z-index: 2;
+  color: var(--primary-deep);
+  font-size: 0.8rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.apricity-avatar__spark--one {
+  inset: -0.15rem auto auto -0.1rem;
+}
+
+.apricity-avatar__spark--two {
+  inset: auto -0.25rem 0.05rem auto;
+  color: #df9cae;
+  font-size: 1.25rem;
+}
+
 .garden-header h1,
 .garden-header p,
 .section-heading h2,
@@ -329,6 +394,32 @@ input:focus-visible {
   background: color-mix(in srgb, var(--peach) 56%, transparent);
 }
 
+.tiny-badge--flow {
+  color: var(--ink-strong);
+  background: var(--sun);
+  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--sun) 30%, transparent);
+}
+
+.energy-card.is-flow-next,
+.reward-card.is-flow-next {
+  border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+  animation: flow-pulse 1.8s ease-in-out infinite;
+}
+
+.quests-section.is-flow-next {
+  padding: 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--primary) 24%, transparent);
+  border-radius: 1.35rem;
+  animation: flow-pulse 1.8s ease-in-out infinite;
+}
+
+.energy-card:focus,
+.quests-section:focus,
+.reward-card:focus {
+  outline: 0.2rem solid color-mix(in srgb, var(--primary) 30%, transparent);
+  outline-offset: 0.2rem;
+}
+
 .energy-card {
   display: grid;
   gap: 1rem;
@@ -455,6 +546,17 @@ input:focus-visible {
 
 .growth-card__copy {
   padding: 0.6rem 0.3rem;
+}
+
+.growth-card__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.growth-card__topline .apricity-avatar {
+  margin: -0.25rem 0.4rem 0 0;
 }
 
 .growth-card__copy h2 {
@@ -627,6 +729,10 @@ input:focus-visible {
   animation: soft-bloom 800ms both;
 }
 
+.growth-card.is-blooming .apricity-avatar {
+  animation: soft-bloom 800ms both;
+}
+
 .growth-spark {
   position: absolute;
   z-index: 2;
@@ -645,6 +751,72 @@ input:focus-visible {
 
 .quests-section {
   padding: 0.35rem 0;
+  transition: padding 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.week-memory {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.1rem 1.25rem;
+}
+
+.week-memory__copy {
+  margin: -0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.week-memory__days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.week-memory__day {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.15rem 0.45rem;
+  color: var(--muted);
+  border: 1px solid transparent;
+  border-radius: 0.8rem;
+  font-size: 0.6rem;
+}
+
+.week-memory__day.is-today {
+  color: var(--primary-deep);
+  background: var(--primary-soft);
+  border-color: color-mix(in srgb, var(--primary) 24%, transparent);
+}
+
+.week-memory__label {
+  white-space: nowrap;
+}
+
+.week-memory__dot {
+  display: grid;
+  place-items: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  color: color-mix(in srgb, var(--muted) 60%, transparent);
+  background: color-mix(in srgb, var(--surface-strong) 72%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--muted) 30%, transparent);
+  border-radius: 50%;
+}
+
+.week-memory__dot > span {
+  width: 0.35rem;
+  height: 0.35rem;
+  background: color-mix(in srgb, var(--muted) 35%, transparent);
+  border-radius: 50%;
+}
+
+.week-memory__day.is-bloom .week-memory__dot {
+  color: #a67b22;
+  background: var(--sun);
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--sun) 72%, #fff);
+  box-shadow: 0 0.25rem 0.7rem color-mix(in srgb, var(--sun) 28%, transparent);
 }
 
 .quests-section .section-heading {
@@ -853,6 +1025,12 @@ input:focus-visible {
 
 .reward-card.is-unlocked {
   border-color: color-mix(in srgb, var(--primary) 24%, transparent);
+}
+
+.reward-card.is-done {
+  background:
+    radial-gradient(circle at 2% 105%, color-mix(in srgb, var(--peach) 45%, transparent), transparent 11rem),
+    color-mix(in srgb, var(--primary-soft) 54%, var(--surface));
 }
 
 .reward-options {
@@ -1206,6 +1384,70 @@ input:focus-visible {
   margin-inline-start: auto;
 }
 
+.settings-divider {
+  width: 100%;
+  height: 1px;
+  margin: 0.35rem 0;
+  background: var(--line);
+}
+
+.settings-hint {
+  margin: -0.45rem 0 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.7;
+}
+
+.reward-manager {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.reward-manager__input {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.reward-manager__input .text-input {
+  min-width: 0;
+  flex: 1;
+}
+
+.reward-manager__input .icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.reward-manager__list {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.reward-manager__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.55rem 0.45rem 0.35rem;
+  color: var(--muted);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  font-size: 0.68rem;
+}
+
+.reward-manager__item > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reward-manager__item .delete-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
 .primary-button {
   display: inline-flex;
   align-items: center;
@@ -1243,6 +1485,10 @@ input:focus-visible {
   width: fit-content;
   max-width: calc(100% - 2rem);
   margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
   padding: 0.78rem 1rem;
   color: #fffdfb;
   text-align: center;
@@ -1250,6 +1496,17 @@ input:focus-visible {
   border-radius: 999px;
   box-shadow: 0 14px 30px rgba(67, 52, 79, 0.2);
   animation: toast-in 240ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+
+.toast__action {
+  flex: 0 0 auto;
+  padding: 0.3rem 0.55rem;
+  color: var(--sun);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--sun) 42%, transparent);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
 }
 
 @keyframes pop-in {
@@ -1276,6 +1533,11 @@ input:focus-visible {
 @keyframes toast-in {
   from { opacity: 0; transform: translateY(0.75rem); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes flow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 0%, transparent); }
+  50% { box-shadow: 0 0 0 0.35rem color-mix(in srgb, var(--primary) 9%, transparent); }
 }
 
 @media (max-width: 720px) {
@@ -1318,6 +1580,11 @@ input:focus-visible {
   .brand-mark {
     width: 3rem;
     height: 3rem;
+  }
+
+  .brand-mark--avatar .apricity-avatar svg {
+    width: 2.65rem;
+    height: 2.65rem;
   }
 
   .garden-header h1 {
@@ -1384,6 +1651,10 @@ input:focus-visible {
     padding: 0.2rem;
   }
 
+  .growth-card__topline .apricity-avatar {
+    margin-inline-end: 0;
+  }
+
   .growth-card__copy h2 {
     max-width: 16rem;
     margin-top: 0.55rem;
@@ -1447,6 +1718,18 @@ input:focus-visible {
 
   .reward-option {
     min-height: 2.5rem;
+  }
+
+  .week-memory {
+    padding: 1rem;
+  }
+
+  .week-memory__days {
+    gap: 0.15rem;
+  }
+
+  .week-memory__day {
+    font-size: 0.55rem;
   }
 }
 

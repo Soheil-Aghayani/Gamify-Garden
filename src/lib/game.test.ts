@@ -1,11 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   addTask,
+  addReward,
   createInitialState,
   getDailyPlantStage,
   getDailyTarget,
+  getFlowStep,
   getLongTermPlantStage,
+  markIntroSeen,
   removeTask,
+  restoreTask,
+  setTodayEnergy,
+  setTodayReward,
   toggleQuest,
 } from "./game";
 import { getDayKey, shiftDayKey } from "./date";
@@ -59,8 +65,8 @@ describe("Gamify Garden game rules", () => {
     state = {
       ...state,
       days: {
-        "2026-08-13": { dayKey: "2026-08-13", energy: 1, completedQuestIds: QUESTS.slice(0, 3), dailyWin: true },
-        "2026-08-14": { dayKey: "2026-08-14", energy: 2, completedQuestIds: QUESTS.slice(0, 3), dailyWin: true },
+        "2026-08-13": { dayKey: "2026-08-13", energy: 1, energyConfirmed: true, completedQuestIds: QUESTS.slice(0, 3), dailyWin: true },
+        "2026-08-14": { dayKey: "2026-08-14", energy: 2, energyConfirmed: true, completedQuestIds: QUESTS.slice(0, 3), dailyWin: true },
       },
     };
     state = toggleQuest(state, "llm", DAY).state;
@@ -99,5 +105,51 @@ describe("Gamify Garden game rules", () => {
     state = removeTask(state, "llm");
     expect(state.tasks.some((task) => task.id === "llm")).toBe(false);
     expect(getDailyTarget(state)).toBe(3);
+  });
+
+  it("moves through the gentle daily flow", () => {
+    let state = freshState();
+
+    expect(getFlowStep(state, DAY)).toBe("intro");
+    state = markIntroSeen(state);
+    expect(getFlowStep(state, DAY)).toBe("energy");
+
+    state = setTodayEnergy(state, 2, DAY);
+    expect(getFlowStep(state, DAY)).toBe("tasks");
+    QUESTS.slice(0, 3).forEach((questId) => {
+      state = toggleQuest(state, questId, DAY).state;
+    });
+
+    expect(getFlowStep(state, DAY)).toBe("reward");
+    state = setTodayReward(state, "یک نوشیدنی خوشمزه", DAY);
+    expect(getFlowStep(state, DAY)).toBe("done");
+  });
+
+  it("restores a removed task without losing its previous completion", () => {
+    let state = freshState();
+    state = toggleQuest(state, "llm", DAY).state;
+    const completedBeforeRemoval = { [DAY]: true };
+    state = removeTask(state, "llm");
+    expect(state.days[DAY].completedQuestIds).not.toContain("llm");
+
+    state = restoreTask(state, {
+      id: "llm",
+      title: "LLM",
+      minimumAction: "یک قدم کوچک",
+      energyCopy: { 1: "فقط فایل را باز کن", 2: "ده دقیقه جلو برو", 3: "یک بخش را تمام کن" },
+      iconKey: "brain",
+      isDefault: true,
+    }, completedBeforeRemoval);
+
+    expect(state.days[DAY].completedQuestIds).toContain("llm");
+  });
+
+  it("supports adding custom rewards without duplicates", () => {
+    let state = freshState();
+    state = addReward(state, "چای و موسیقی");
+    state = addReward(state, "چای و موسیقی");
+
+    expect(state.rewards).toContain("چای و موسیقی");
+    expect(state.rewards.filter((reward) => reward === "چای و موسیقی")).toHaveLength(1);
   });
 });

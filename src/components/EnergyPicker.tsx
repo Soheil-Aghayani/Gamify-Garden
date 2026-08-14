@@ -1,8 +1,12 @@
 import { CloudSun, Moon, Zap } from "lucide-react";
+import type { Ref } from "react";
 import type { EnergyLevel } from "../types/game";
 
 interface EnergyPickerProps {
   value: EnergyLevel;
+  confirmed: boolean;
+  isNext: boolean;
+  sectionRef?: Ref<HTMLElement>;
   onChange: (value: EnergyLevel) => void;
 }
 
@@ -17,15 +21,22 @@ const ENERGY_OPTIONS: Array<{
   { value: 3, label: "پرانرژی", copy: "اگر دلت خواست بیشتر", Icon: Zap },
 ];
 
-export function EnergyPicker({ value, onChange }: EnergyPickerProps) {
+export function EnergyPicker({ value, confirmed, isNext, sectionRef, onChange }: EnergyPickerProps) {
   return (
-    <section className="soft-card energy-card" aria-labelledby="energy-title">
+    <section
+      ref={sectionRef}
+      tabIndex={-1}
+      className={`soft-card energy-card${isNext ? " is-flow-next" : ""}${confirmed ? " is-confirmed" : ""}`}
+      aria-labelledby="energy-title"
+    >
       <div className="section-heading section-heading--compact">
         <div>
           <p className="eyebrow">اول از همه</p>
           <h2 id="energy-title">امروز چقدر انرژی داری؟</h2>
         </div>
-        <span className="tiny-badge">هیچ جوابی غلط نیست</span>
+        <span className={`tiny-badge${isNext ? " tiny-badge--flow" : ""}`}>
+          {isNext ? "قدم بعدی" : confirmed ? "انتخاب شد" : "هیچ جوابی غلط نیست"}
+        </span>
       </div>
       <div className="energy-options" role="group" aria-label="انتخاب انرژی امروز">
         {ENERGY_OPTIONS.map(({ value: optionValue, label, copy, Icon }) => {

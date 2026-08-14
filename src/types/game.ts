@@ -3,6 +3,7 @@ export type QuestId = string;
 export type EnergyLevel = 1 | 2 | 3;
 export type PlantStage = "seed" | "sprout" | "flower" | "tree";
 export type PaletteId = "mint" | "lilac" | "peach";
+export type FlowStep = "intro" | "energy" | "tasks" | "reward" | "done" | "manage";
 export type TaskIconKey =
   | "brain"
   | "play"
@@ -31,6 +32,7 @@ export type Quest = TaskDefinition;
 export interface DailyState {
   dayKey: string;
   energy: EnergyLevel;
+  energyConfirmed: boolean;
   completedQuestIds: QuestId[];
   dailyWin: boolean;
   rewardChoice?: string;
@@ -39,6 +41,7 @@ export interface DailyState {
 export interface Profile {
   displayName: string;
   nickname: string;
+  avatarSeed: string;
   palette: PaletteId;
 }
 
@@ -49,4 +52,6 @@ export interface GameState {
   totalWins: number;
   gentleStreak: number;
   plantStage: PlantStage;
+  hasSeenIntro: boolean;
+  rewards: string[];
 }

@@ -2,16 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import { getDayKey } from "./lib/date";
 import {
   addTask,
+  addReward,
   getDailyTarget,
   getDayState,
+  getFlowStep,
+  markIntroSeen,
   removeTask,
+  removeReward,
+  restoreTask,
   setProfile,
   setTodayEnergy,
   setTodayReward,
   toggleQuest,
 } from "./lib/game";
 import { loadGameState, saveGameState } from "./lib/storage";
-import type { EnergyLevel, GameState, Profile, QuestId, TaskDefinition } from "./types/game";
+import type { EnergyLevel, FlowStep, GameState, Profile, QuestId, TaskDefinition } from "./types/game";
 import { EnergyPicker } from "./components/EnergyPicker";
 import { GardenHeader } from "./components/GardenHeader";
 import { GrowthScene } from "./components/GrowthScene";
@@ -20,18 +25,34 @@ import { QuestGrid } from "./components/QuestGrid";
 import { RewardBanner } from "./components/RewardBanner";
 import { SettingsDrawer } from "./components/SettingsDrawer";
 import { TaskManagerDrawer } from "./components/TaskManagerDrawer";
+import { WeekMemory } from "./components/WeekMemory";
 import "./styles.css";
+
+interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
+interface ToastState {
+  message: string;
+  action?: ToastAction;
+}
 
 export default function App() {
   const [gameState, setGameState] = useState<GameState>(() => loadGameState());
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [taskManagerOpen, setTaskManagerOpen] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<ToastState | null>(null);
   const toastTimer = useRef<number | undefined>(undefined);
+  const energyRef = useRef<HTMLElement | null>(null);
+  const questsRef = useRef<HTMLElement | null>(null);
+  const rewardRef = useRef<HTMLElement | null>(null);
+  const previousFlowStep = useRef<FlowStep | null>(null);
   const todayKey = getDayKey();
   const today = getDayState(gameState, todayKey);
   const target = getDailyTarget(gameState);
+  const flowStep = getFlowStep(gameState, todayKey);
 
   useEffect(() => {
     saveGameState(gameState);
@@ -49,10 +70,36 @@ export default function App() {
     };
   }, []);
 
-  const showToast = (message: string) => {
-    setToast(message);
+  useEffect(() => {
+    if (!gameState.hasSeenIntro) setGuideOpen(true);
+  }, [gameState.hasSeenIntro]);
+
+  const focusSection = (sectionRef: typeof energyRef) => {
+    const section = sectionRef.current;
+    if (!section) return;
+    section.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => section.focus({ preventScroll: true }), 360);
+  };
+
+  useEffect(() => {
+    const previousStep = previousFlowStep.current;
+    if (previousStep !== null && previousStep !== flowStep) {
+      if (flowStep === "energy") focusSection(energyRef);
+      if (flowStep === "tasks") focusSection(questsRef);
+      if (flowStep === "reward" || flowStep === "done") focusSection(rewardRef);
+    }
+    previousFlowStep.current = flowStep;
+  }, [flowStep]);
+
+  const showToast = (message: string, action?: ToastAction) => {
+    setToast({ message, action });
     if (toastTimer.current) window.clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(() => setToast(null), 2600);
+    toastTimer.current = window.setTimeout(() => setToast(null), action ? 5000 : 2600);
+  };
+
+  const handleGuideClose = () => {
+    if (!gameState.hasSeenIntro) setGameState((current) => markIntroSeen(current));
+    setGuideOpen(false);
   };
 
   const handleEnergyChange = (energy: EnergyLevel) => {
@@ -69,6 +116,9 @@ export default function App() {
     const nextToday = getDayState(result.state, todayKey);
     if (nextToday.dailyWin && !today.dailyWin) {
       showToast("باغ امروز شکوفه زد؛ آفرین بهت ✨");
+    } else if (nextToday.completedQuestIds.length > today.completedQuestIds.length) {
+      const remaining = target - nextToday.completedQuestIds.length;
+      showToast(remaining > 0 ? `${remaining} قدم کوچیک دیگه تا شکوفه 🌱` : "قدم قشنگی بود 🌱");
     }
     setGameState(result.state);
   };
@@ -88,10 +138,32 @@ export default function App() {
     showToast(`${task.title} به باغ اضافه شد 🌱`);
   };
 
+  const handleAddReward = (reward: string) => {
+    setGameState((current) => addReward(current, reward));
+    showToast(`${reward} به جایزه‌ها اضافه شد 💛`);
+  };
+
+  const handleRemoveReward = (reward: string) => {
+    setGameState((current) => removeReward(current, reward));
+    showToast(`${reward} از جایزه‌ها کنار رفت`);
+  };
+
   const handleRemoveTask = (taskId: string) => {
     const task = gameState.tasks.find((item) => item.id === taskId);
+    const completedBeforeRemoval = Object.fromEntries(
+      Object.entries(gameState.days).map(([dayKey, day]) => [dayKey, day.completedQuestIds.includes(taskId)]),
+    );
     setGameState((current) => removeTask(current, taskId));
-    if (task) showToast(`${task.title} از باغ بیرون رفت`);
+    if (task) {
+      showToast(`${task.title} از باغ بیرون رفت`, {
+        label: "برگردان",
+        onClick: () => {
+          setGameState((current) => restoreTask(current, task, completedBeforeRemoval));
+          if (toastTimer.current) window.clearTimeout(toastTimer.current);
+          setToast(null);
+        },
+      });
+    }
   };
 
   return (
@@ -102,6 +174,9 @@ export default function App() {
         <GardenHeader
           displayName={gameState.profile.displayName}
           nickname={gameState.profile.nickname}
+          avatarSeed={gameState.profile.avatarSeed}
+          palette={gameState.profile.palette}
+          plantStage={gameState.plantStage}
           totalWins={gameState.totalWins}
           gentleStreak={gameState.gentleStreak}
           onGuide={() => setGuideOpen(true)}
@@ -109,20 +184,38 @@ export default function App() {
         />
 
         <div className="page-content">
-          <EnergyPicker value={today.energy} onChange={handleEnergyChange} />
-          <GrowthScene completedCount={today.completedQuestIds.length} target={target} totalWins={gameState.totalWins} />
+          <EnergyPicker
+            value={today.energy}
+            confirmed={today.energyConfirmed}
+            isNext={flowStep === "energy"}
+            sectionRef={energyRef}
+            onChange={handleEnergyChange}
+          />
+          <GrowthScene
+            completedCount={today.completedQuestIds.length}
+            target={target}
+            totalWins={gameState.totalWins}
+            avatarSeed={gameState.profile.avatarSeed}
+            palette={gameState.profile.palette}
+          />
+          <WeekMemory days={gameState.days} todayKey={todayKey} />
           <QuestGrid
             quests={gameState.tasks}
             energy={today.energy}
             completedQuestIds={today.completedQuestIds}
             target={target}
+            isNext={flowStep === "tasks" || flowStep === "manage"}
+            sectionRef={questsRef}
             onManage={() => setTaskManagerOpen(true)}
             onToggle={handleQuestToggle}
           />
           <RewardBanner
             dailyWin={today.dailyWin}
             target={target}
+            rewards={gameState.rewards}
             selectedReward={today.rewardChoice}
+            isNext={flowStep === "reward"}
+            sectionRef={rewardRef}
             onChoose={handleReward}
           />
         </div>
@@ -133,12 +226,15 @@ export default function App() {
         </footer>
       </main>
 
-      <GuideDrawer open={guideOpen} onClose={() => setGuideOpen(false)} />
+      <GuideDrawer open={guideOpen} onClose={handleGuideClose} />
       <SettingsDrawer
         open={settingsOpen}
         profile={gameState.profile}
+        rewards={gameState.rewards}
         onClose={() => setSettingsOpen(false)}
         onSave={handleProfileSave}
+        onAddReward={handleAddReward}
+        onRemoveReward={handleRemoveReward}
       />
       <TaskManagerDrawer
         open={taskManagerOpen}
@@ -148,7 +244,16 @@ export default function App() {
         onRemove={handleRemoveTask}
       />
 
-      {toast && <div className="toast" role="status">{toast}</div>}
+      {toast && (
+        <div className="toast" role="status">
+          <span>{toast.message}</span>
+          {toast.action && (
+            <button type="button" className="toast__action" onClick={toast.action.onClick}>
+              {toast.action.label}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
