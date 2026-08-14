@@ -17,14 +17,16 @@ const PALETTES: Array<{ id: PaletteId; label: string; colors: string[] }> = [
 
 export function SettingsDrawer({ open, profile, onClose, onSave }: SettingsDrawerProps) {
   const [draftName, setDraftName] = useState(profile.displayName);
+  const [draftNickname, setDraftNickname] = useState(profile.nickname);
   const [draftPalette, setDraftPalette] = useState<PaletteId>(profile.palette);
 
   useEffect(() => {
     if (open) {
       setDraftName(profile.displayName);
+      setDraftNickname(profile.nickname);
       setDraftPalette(profile.palette);
     }
-  }, [open, profile.displayName, profile.palette]);
+  }, [open, profile.displayName, profile.nickname, profile.palette]);
 
   useEffect(() => {
     if (!open) return;
@@ -39,7 +41,8 @@ export function SettingsDrawer({ open, profile, onClose, onSave }: SettingsDrawe
 
   const save = () => {
     onSave({
-      displayName: draftName.trim() || "دوست من",
+      displayName: draftName.trim() || "فاطمه",
+      nickname: draftNickname.trim() || "Apricity",
       palette: draftPalette,
     });
     onClose();
@@ -73,6 +76,16 @@ export function SettingsDrawer({ open, profile, onClose, onSave }: SettingsDrawe
           className="text-input"
           value={draftName}
           onChange={(event) => setDraftName(event.target.value)}
+          maxLength={24}
+          autoComplete="off"
+        />
+
+        <label className="field-label" htmlFor="garden-nickname">اسم صمیمی باغ</label>
+        <input
+          id="garden-nickname"
+          className="text-input"
+          value={draftNickname}
+          onChange={(event) => setDraftNickname(event.target.value)}
           maxLength={24}
           autoComplete="off"
         />

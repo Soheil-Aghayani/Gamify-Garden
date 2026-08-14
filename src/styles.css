@@ -1,5 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap");
+
 :root {
-  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-family: "Vazirmatn", Tahoma, "Segoe UI", sans-serif;
   color: #5d536e;
   background: #fff8f0;
   font-synthesis: none;
@@ -142,6 +144,11 @@ input:focus-visible {
 
 .garden-header__side {
   gap: 0.65rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.45rem;
 }
 
 .brand-mark {
@@ -644,6 +651,30 @@ input:focus-visible {
   margin-bottom: 0.85rem;
 }
 
+.quest-heading-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.2rem;
+  color: var(--primary-deep);
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+}
+
+.text-button:hover {
+  color: var(--ink-strong);
+}
+
 .quest-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -766,6 +797,31 @@ input:focus-visible {
   background: var(--sun);
 }
 
+.empty-tasks {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  padding: 2rem 1rem;
+  color: var(--muted);
+  text-align: center;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--primary) 32%, transparent);
+  border-radius: 1.35rem;
+}
+
+.empty-tasks > svg {
+  color: var(--primary-deep);
+}
+
+.empty-tasks strong {
+  color: var(--ink-strong);
+  font-size: 0.86rem;
+}
+
+.empty-tasks span {
+  font-size: 0.7rem;
+}
+
 .reward-card {
   align-items: flex-start;
   gap: 0.85rem;
@@ -872,6 +928,12 @@ input:focus-visible {
   animation: drawer-in 260ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
 }
 
+.guide-drawer {
+  background:
+    radial-gradient(circle at 96% 3%, color-mix(in srgb, var(--lavender) 56%, transparent), transparent 12rem),
+    var(--surface-strong);
+}
+
 .drawer-header {
   display: flex;
   align-items: flex-start;
@@ -892,6 +954,202 @@ input:focus-visible {
   color: var(--primary-deep);
   background: var(--primary-soft);
   border-radius: 0.9rem;
+}
+
+.drawer-title__icon--warm {
+  color: #a67b22;
+  background: var(--sun);
+}
+
+.guide-intro {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--peach) 28%, transparent);
+  border-radius: 1.1rem;
+  font-size: 0.75rem;
+  line-height: 1.8;
+}
+
+.guide-intro strong {
+  color: var(--ink-strong);
+}
+
+.guide-steps {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.guide-step {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+}
+
+.guide-step__number {
+  display: grid;
+  place-items: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  color: var(--primary-deep);
+  background: var(--primary-soft);
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.guide-step__icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  color: var(--primary-deep);
+  background: color-mix(in srgb, var(--lavender) 55%, transparent);
+  border-radius: 0.7rem;
+}
+
+.guide-step__copy {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.guide-step__copy strong {
+  color: var(--ink-strong);
+  font-size: 0.75rem;
+}
+
+.guide-step__copy small {
+  color: var(--muted);
+  font-size: 0.66rem;
+  line-height: 1.65;
+}
+
+.task-form {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--primary-soft) 58%, transparent);
+  border-radius: 1.2rem;
+}
+
+.task-form .primary-button {
+  justify-content: center;
+}
+
+.icon-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.icon-picker__option {
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  color: var(--muted);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.icon-picker__option:hover,
+.icon-picker__option.is-selected {
+  color: var(--primary-deep);
+  background: var(--primary-soft);
+  border-color: color-mix(in srgb, var(--primary) 28%, transparent);
+  transform: translateY(-2px);
+}
+
+.task-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.45rem;
+}
+
+.task-list {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 0.95rem;
+}
+
+.task-row__icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  color: var(--primary-deep);
+  background: var(--primary-soft);
+  border-radius: 0.7rem;
+}
+
+.task-row__copy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 0.15rem;
+}
+
+.task-row__copy strong,
+.task-row__copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-row__copy strong {
+  color: var(--ink-strong);
+  font-size: 0.75rem;
+}
+
+.task-row__copy small {
+  color: var(--muted);
+  font-size: 0.63rem;
+}
+
+.delete-button {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  color: #c38d9d;
+  background: transparent;
+  border: 0;
+  border-radius: 0.65rem;
+}
+
+.delete-button:hover {
+  color: #a85872;
+  background: #fff0f3;
+}
+
+.task-list__empty {
+  padding: 1rem;
+  color: var(--muted);
+  background: #fff;
+  border-radius: 0.95rem;
+  font-size: 0.72rem;
+  text-align: center;
 }
 
 .field-label {
@@ -949,6 +1207,10 @@ input:focus-visible {
 }
 
 .primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   padding: 0.85rem 1rem;
   color: #fffdfb;
   background: linear-gradient(135deg, var(--primary), var(--primary-deep));
@@ -956,6 +1218,13 @@ input:focus-visible {
   border-radius: 1rem;
   box-shadow: 0 10px 22px color-mix(in srgb, var(--primary) 24%, transparent);
   transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+  box-shadow: none;
 }
 
 .primary-button:hover {
@@ -1068,6 +1337,12 @@ input:focus-visible {
 
   .section-heading {
     align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .quest-heading-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .section-heading h2,

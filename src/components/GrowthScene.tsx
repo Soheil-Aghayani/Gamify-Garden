@@ -6,6 +6,7 @@ import { PlantArtwork } from "./PlantArtwork";
 
 interface GrowthSceneProps {
   completedCount: number;
+  target: number;
   totalWins: number;
 }
 
@@ -16,17 +17,19 @@ const STAGE_LABELS: Record<PlantStage, string> = {
   tree: "درخت",
 };
 
-export function GrowthScene({ completedCount, totalWins }: GrowthSceneProps) {
-  const stage = getDailyPlantStage(completedCount);
-  const progress = Math.min(100, Math.round((completedCount / 3) * 100));
-  const isComplete = completedCount >= 3;
-  const message = isComplete
-    ? "امروز باغت شکوفه زد"
-    : completedCount === 2
-      ? "فقط یک قدم تا شکوفه"
-      : completedCount === 1
-        ? "جوانه‌اش را دیدی"
-        : "یک قدم کوچک بردار";
+export function GrowthScene({ completedCount, target, totalWins }: GrowthSceneProps) {
+  const stage = getDailyPlantStage(completedCount, target);
+  const progress = target === 0 ? 0 : Math.min(100, Math.round((completedCount / target) * 100));
+  const isComplete = target > 0 && completedCount >= target;
+  const message = target === 0
+    ? "اول یک مأموریت برای باغت بساز"
+    : isComplete
+      ? "امروز باغت شکوفه زد"
+      : completedCount === target - 1
+        ? "فقط یک قدم تا شکوفه"
+        : completedCount === 1
+          ? "جوانه‌اش را دیدی"
+          : "یک قدم کوچک بردار";
 
   return (
     <section className={`growth-card soft-card${isComplete ? " is-blooming" : ""}`} aria-labelledby="growth-title" aria-live="polite">
@@ -37,7 +40,7 @@ export function GrowthScene({ completedCount, totalWins }: GrowthSceneProps) {
         <h2 id="growth-title">باغت آرام‌آرام رشد می‌کند</h2>
         <p>{message}</p>
         <div className="growth-facts">
-          <span><strong>{completedCount}</strong> از ۳ قدم</span>
+          <span><strong>{completedCount}</strong> از {target} قدم</span>
           <span><strong>{totalWins}</strong> شکوفه‌ی قبلی</span>
         </div>
         <div className="growth-stage"><span className="growth-stage__dot" /> {STAGE_LABELS[stage]}</div>

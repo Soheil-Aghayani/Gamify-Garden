@@ -1,24 +1,32 @@
-import type { LucideIcon } from "lucide-react";
-
-export type QuestId =
-  | "llm"
-  | "article-video"
-  | "language"
-  | "article"
-  | "exercise"
-  | "writing";
+export type QuestId = string;
 
 export type EnergyLevel = 1 | 2 | 3;
 export type PlantStage = "seed" | "sprout" | "flower" | "tree";
 export type PaletteId = "mint" | "lilac" | "peach";
+export type TaskIconKey =
+  | "brain"
+  | "play"
+  | "languages"
+  | "book"
+  | "exercise"
+  | "writing"
+  | "sparkles"
+  | "star"
+  | "heart"
+  | "sun"
+  | "lightbulb";
 
-export interface Quest {
+export interface TaskDefinition {
   id: QuestId;
   title: string;
   minimumAction: string;
   energyCopy: Record<EnergyLevel, string>;
-  icon: LucideIcon;
+  iconKey: TaskIconKey;
+  isDefault?: boolean;
+  createdAt?: number;
 }
+
+export type Quest = TaskDefinition;
 
 export interface DailyState {
   dayKey: string;
@@ -30,11 +38,13 @@ export interface DailyState {
 
 export interface Profile {
   displayName: string;
+  nickname: string;
   palette: PaletteId;
 }
 
 export interface GameState {
   profile: Profile;
+  tasks: TaskDefinition[];
   days: Record<string, DailyState>;
   totalWins: number;
   gentleStreak: number;

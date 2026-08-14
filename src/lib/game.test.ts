@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { getDailyPlantStage, getLongTermPlantStage, toggleQuest } from "./game";
+import {
+  addTask,
+  createInitialState,
+  getDailyPlantStage,
+  getDailyTarget,
+  getLongTermPlantStage,
+  removeTask,
+  toggleQuest,
+} from "./game";
 import { getDayKey, shiftDayKey } from "./date";
 import type { GameState, QuestId } from "../types/game";
 
@@ -7,13 +15,7 @@ const DAY = "2026-08-15";
 const QUESTS: QuestId[] = ["llm", "article-video", "language", "article"];
 
 function freshState(): GameState {
-  return {
-    profile: { displayName: "دوست من", palette: "mint" },
-    days: {},
-    totalWins: 0,
-    gentleStreak: 0,
-    plantStage: "seed",
-  };
+  return createInitialState();
 }
 
 describe("Gamify Garden game rules", () => {
@@ -77,5 +79,25 @@ describe("Gamify Garden game rules", () => {
     expect(getLongTermPlantStage(0)).toBe("seed");
     expect(getLongTermPlantStage(3)).toBe("flower");
     expect(getLongTermPlantStage(6)).toBe("tree");
+  });
+
+  it("supports custom tasks and adapts the daily target when tasks are removed", () => {
+    let state = freshState();
+    const customTask = {
+      id: "custom-room",
+      title: "مرتب‌کردن اتاق",
+      minimumAction: "پنج دقیقه",
+      energyCopy: { 1: "پنج دقیقه", 2: "پنج دقیقه", 3: "پنج دقیقه یا بیشتر" },
+      iconKey: "sparkles" as const,
+      isDefault: false,
+    };
+
+    state = addTask(state, customTask);
+    expect(state.tasks.some((task) => task.id === "custom-room")).toBe(true);
+    expect(getDailyTarget(state)).toBe(3);
+
+    state = removeTask(state, "llm");
+    expect(state.tasks.some((task) => task.id === "llm")).toBe(false);
+    expect(getDailyTarget(state)).toBe(3);
   });
 });

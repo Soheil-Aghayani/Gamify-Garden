@@ -1,3 +1,4 @@
+import { DEFAULT_TASKS } from "../data/quests";
 import { getDayKey, shiftDayKey } from "./date";
 import type {
   DailyState,
@@ -6,12 +7,14 @@ import type {
   PlantStage,
   Profile,
   QuestId,
+  TaskDefinition,
 } from "../types/game";
 
 export const DAILY_TARGET = 3;
 
 export const DEFAULT_PROFILE: Profile = {
-  displayName: "دوست من",
+  displayName: "فاطمه",
+  nickname: "Apricity",
   palette: "mint",
 };
 
@@ -27,6 +30,7 @@ export function createEmptyDay(dayKey = getDayKey()): DailyState {
 export function createInitialState(): GameState {
   return {
     profile: DEFAULT_PROFILE,
+    tasks: DEFAULT_TASKS.map((task) => ({ ...task, energyCopy: { ...task.energyCopy } })),
     days: {},
     totalWins: 0,
     gentleStreak: 0,
@@ -38,10 +42,19 @@ export function getDayState(state: GameState, dayKey = getDayKey()): DailyState 
   return state.days[dayKey] ?? createEmptyDay(dayKey);
 }
 
-export function getDailyPlantStage(completedCount: number): PlantStage {
-  if (completedCount >= DAILY_TARGET) return "tree";
-  if (completedCount === 2) return "flower";
-  if (completedCount === 1) return "sprout";
+export function getDailyTarget(state: GameState): number {
+  return Math.min(DAILY_TARGET, state.tasks.length);
+}
+
+export function isDailyWin(completedCount: number, target: number): boolean {
+  return target > 0 && completedCount >= target;
+}
+
+export function getDailyPlantStage(completedCount: number, target = DAILY_TARGET): PlantStage {
+  if (target <= 0) return "seed";
+  if (completedCount >= target) return "tree";
+  if (completedCount >= Math.max(1, target - 1)) return "flower";
+  if (completedCount > 0) return "sprout";
   return "seed";
 }
 
@@ -104,9 +117,11 @@ export function toggleQuest(
   dayKey = getDayKey(),
 ): ToggleQuestResult {
   const day = getDayState(state, dayKey);
+  const target = getDailyTarget(state);
   const isComplete = day.completedQuestIds.includes(questId);
+  const taskExists = state.tasks.some((task) => task.id === questId);
 
-  if (!isComplete && day.completedQuestIds.length >= DAILY_TARGET) {
+  if (!taskExists || (!isComplete && day.completedQuestIds.length >= target)) {
     return { state, blocked: true };
   }
 
@@ -117,8 +132,8 @@ export function toggleQuest(
   const nextDay: DailyState = {
     ...day,
     completedQuestIds,
-    dailyWin: completedQuestIds.length >= DAILY_TARGET,
-    rewardChoice: completedQuestIds.length >= DAILY_TARGET ? day.rewardChoice : undefined,
+    dailyWin: isDailyWin(completedQuestIds.length, target),
+    rewardChoice: isDailyWin(completedQuestIds.length, target) ? day.rewardChoice : undefined,
   };
 
   return {
@@ -131,6 +146,28 @@ export function toggleQuest(
     }),
     blocked: false,
   };
+}
+
+export function addTask(state: GameState, task: TaskDefinition): GameState {
+  if (state.tasks.some((existingTask) => existingTask.id === task.id)) return state;
+  return {
+    ...state,
+    tasks: [...state.tasks, task],
+  };
+}
+
+export function removeTask(state: GameState, taskId: QuestId): GameState {
+  const tasks = state.tasks.filter((task) => task.id !== taskId);
+  const target = Math.min(DAILY_TARGET, tasks.length);
+  const days = Object.fromEntries(
+    Object.entries(state.days).map(([dayKey, day]) => {
+      const completedQuestIds = day.completedQuestIds.filter((id) => id !== taskId);
+      const dailyWin = isDailyWin(completedQuestIds.length, target);
+      return [dayKey, { ...day, completedQuestIds, dailyWin, rewardChoice: dailyWin ? day.rewardChoice : undefined }];
+    }),
+  );
+
+  return recalculateStats({ ...state, tasks, days });
 }
 
 export function setTodayEnergy(

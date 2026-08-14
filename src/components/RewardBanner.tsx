@@ -2,6 +2,7 @@ import { Check, Gift, Heart, Sparkles } from "lucide-react";
 
 interface RewardBannerProps {
   dailyWin: boolean;
+  target: number;
   selectedReward?: string;
   onChoose: (reward: string) => void;
 }
@@ -12,7 +13,8 @@ const REWARDS = [
   "یک بغل و قدم‌زدن",
 ];
 
-export function RewardBanner({ dailyWin, selectedReward, onChoose }: RewardBannerProps) {
+export function RewardBanner({ dailyWin, target, selectedReward, onChoose }: RewardBannerProps) {
+  const emptyGarden = target === 0;
   return (
     <section className={`reward-card soft-card${dailyWin ? " is-unlocked" : ""}`} aria-labelledby="reward-title">
       <div className="reward-card__icon" aria-hidden="true">
@@ -20,8 +22,8 @@ export function RewardBanner({ dailyWin, selectedReward, onChoose }: RewardBanne
       </div>
       <div className="reward-card__content">
         <p className="eyebrow">جایزه‌ی مهربانانه</p>
-        <h2 id="reward-title">{dailyWin ? "امروز را بردی ✨" : "سه قدم، یک جایزه‌ی کوچیک"}</h2>
-        <p>{dailyWin ? "یکی را برای خودت انتخاب کن؛ واقعاً حقته." : "لازم نیست بزرگ باشد؛ فقط چیزی که حالت را خوب کند."}</p>
+        <h2 id="reward-title">{dailyWin ? "امروز را بردی ✨" : emptyGarden ? "اول یک کار به باغ اضافه کن" : `${target} قدم، یک جایزه‌ی کوچیک`}</h2>
+        <p>{dailyWin ? "یکی را برای خودت انتخاب کن؛ واقعاً حقته." : emptyGarden ? "هر چیزی که دوست داری می‌تواند اولین جوانه باشد." : "لازم نیست بزرگ باشد؛ فقط چیزی که حالت را خوب کند."}</p>
         {dailyWin && (
           <div className="reward-options" role="group" aria-label="انتخاب جایزه">
             {REWARDS.map((reward) => {

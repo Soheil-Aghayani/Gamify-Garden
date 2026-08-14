@@ -1,14 +1,6 @@
-import {
-  BookOpen,
-  BrainCircuit,
-  CirclePlay,
-  Dumbbell,
-  Languages,
-  PenLine,
-} from "lucide-react";
-import type { Quest } from "../types/game";
+import type { TaskDefinition } from "../types/game";
 
-export const QUESTS: readonly Quest[] = [
+export const DEFAULT_TASKS: readonly TaskDefinition[] = [
   {
     id: "llm",
     title: "LLM",
@@ -18,7 +10,8 @@ export const QUESTS: readonly Quest[] = [
       2: "ده دقیقه جلو برو",
       3: "یک بخش را تمام کن",
     },
-    icon: BrainCircuit,
+    iconKey: "brain",
+    isDefault: true,
   },
   {
     id: "article-video",
@@ -29,7 +22,8 @@ export const QUESTS: readonly Quest[] = [
       2: "یک بخش را ببین",
       3: "یادداشت کوتاه بردار",
     },
-    icon: CirclePlay,
+    iconKey: "play",
+    isDefault: true,
   },
   {
     id: "language",
@@ -40,7 +34,8 @@ export const QUESTS: readonly Quest[] = [
       2: "یک تمرین کوتاه",
       3: "یک درس کوچک",
     },
-    icon: Languages,
+    iconKey: "languages",
+    isDefault: true,
   },
   {
     id: "article",
@@ -51,7 +46,8 @@ export const QUESTS: readonly Quest[] = [
       2: "پنج تا ده دقیقه",
       3: "یک مقاله کامل",
     },
-    icon: BookOpen,
+    iconKey: "book",
+    isDefault: true,
   },
   {
     id: "exercise",
@@ -62,7 +58,8 @@ export const QUESTS: readonly Quest[] = [
       2: "یک پیاده‌روی کوتاه",
       3: "تمرین کامل‌تر",
     },
-    icon: Dumbbell,
+    iconKey: "exercise",
+    isDefault: true,
   },
   {
     id: "writing",
@@ -73,6 +70,9 @@ export const QUESTS: readonly Quest[] = [
       2: "ده دقیقه بنویس",
       3: "یک تکه از متن را بنویس",
     },
-    icon: PenLine,
+    iconKey: "writing",
+    isDefault: true,
   },
 ];
+
+export const QUESTS = DEFAULT_TASKS;

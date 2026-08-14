@@ -1,16 +1,20 @@
-import { Heart, Settings2, Sparkles, Trophy } from "lucide-react";
+import { BookOpen, Heart, Settings2, Sparkles, Trophy } from "lucide-react";
 
 interface GardenHeaderProps {
   displayName: string;
+  nickname: string;
   totalWins: number;
   gentleStreak: number;
+  onGuide: () => void;
   onSettings: () => void;
 }
 
 export function GardenHeader({
   displayName,
+  nickname,
   totalWins,
   gentleStreak,
+  onGuide,
   onSettings,
 }: GardenHeaderProps) {
   return (
@@ -21,8 +25,8 @@ export function GardenHeader({
         </div>
         <div>
           <p className="eyebrow">سلام، {displayName} <Heart className="inline-heart" size={14} fill="currentColor" /></p>
-          <h1>باغ امروزت</h1>
-          <p className="header-subtitle">سه قدم کوچیک، یک حالِ بهتر.</p>
+          <h1>{nickname}</h1>
+          <p className="header-subtitle">گرمای آفتاب در روزهای سرد.</p>
         </div>
       </div>
 
@@ -37,9 +41,14 @@ export function GardenHeader({
             <span><strong>{gentleStreak}</strong><small>روز نرم</small></span>
           </div>
         </div>
-        <button className="icon-button" type="button" onClick={onSettings} aria-label="باز کردن تنظیمات">
-          <Settings2 size={20} strokeWidth={1.8} />
-        </button>
+        <div className="header-actions">
+          <button className="icon-button" type="button" onClick={onGuide} aria-label="راهنمای Apricity">
+            <BookOpen size={20} strokeWidth={1.8} />
+          </button>
+          <button className="icon-button" type="button" onClick={onSettings} aria-label="باز کردن تنظیمات">
+            <Settings2 size={20} strokeWidth={1.8} />
+          </button>
+        </div>
       </div>
     </header>
   );

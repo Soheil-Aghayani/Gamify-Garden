@@ -1,5 +1,6 @@
 import { Check, Sparkles } from "lucide-react";
 import type { EnergyLevel, Quest } from "../types/game";
+import { TaskIcon } from "./taskIcons";
 
 interface QuestTileProps {
   quest: Quest;
@@ -9,7 +10,6 @@ interface QuestTileProps {
 }
 
 export function QuestTile({ quest, energy, complete, onToggle }: QuestTileProps) {
-  const Icon = quest.icon;
   return (
     <button
       className={`quest-tile${complete ? " is-complete" : ""}`}
@@ -18,7 +18,7 @@ export function QuestTile({ quest, energy, complete, onToggle }: QuestTileProps)
       aria-pressed={complete}
       aria-label={`${quest.title}: ${quest.energyCopy[energy]}`}
     >
-      <span className="quest-tile__icon" aria-hidden="true"><Icon size={22} strokeWidth={1.8} /></span>
+      <span className="quest-tile__icon" aria-hidden="true"><TaskIcon iconKey={quest.iconKey} size={22} /></span>
       <span className="quest-tile__body">
         <strong>{quest.title}</strong>
         <small>{quest.energyCopy[energy]}</small>
