@@ -21,7 +21,7 @@ export function ApricityAvatar({ seed, palette, stage, size = 64, label = "آو�
       <span className="apricity-avatar__halo" aria-hidden="true" />
       <Avatar
         name={seed}
-        variant="marble"
+        variant="beam"
         colors={AVATAR_COLORS[palette]}
         size={size}
         title
