@@ -1,5 +1,6 @@
 import { Gift, Heart, ListPlus, Moon, Sprout, X } from "lucide-react";
 import { useEffect } from "react";
+import { toPersianDigits } from "../lib/format";
 
 interface GuideDrawerProps {
   open: boolean;
@@ -71,7 +72,7 @@ export function GuideDrawer({ open, onClose }: GuideDrawerProps) {
         <div className="guide-steps">
           {GUIDE_STEPS.map(({ Icon, title, copy }, index) => (
             <div className="guide-step" key={title}>
-              <span className="guide-step__number">{index + 1}</span>
+              <span className="guide-step__number">{toPersianDigits(index + 1)}</span>
               <span className="guide-step__icon" aria-hidden="true"><Icon size={19} /></span>
               <span className="guide-step__copy">
                 <strong>{title}</strong>

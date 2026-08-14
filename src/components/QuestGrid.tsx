@@ -1,6 +1,7 @@
 import { ListPlus } from "lucide-react";
 import type { Ref } from "react";
 import type { EnergyLevel, Quest, QuestId } from "../types/game";
+import { toPersianDigits } from "../lib/format";
 import { QuestTile } from "./QuestTile";
 
 interface QuestGridProps {
@@ -24,7 +25,7 @@ export function QuestGrid({ quests, energy, completedQuestIds, target, isNext, s
         </div>
         <div className="quest-heading-actions">
           <span className={`tiny-badge${isNext ? " tiny-badge--flow" : ""}`}>
-            {target === 0 ? "یک کار اضافه کن" : isNext ? "حالا یکی رو انتخاب کن" : `${target} تا کافیه`}
+            {target === 0 ? "یک کار اضافه کن" : isNext ? "حالا یکی رو انتخاب کن" : `${toPersianDigits(target)} تا کافیه`}
           </span>
           <button className="text-button" type="button" onClick={onManage}>
             <ListPlus size={16} />

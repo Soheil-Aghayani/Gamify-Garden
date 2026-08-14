@@ -1,6 +1,7 @@
 import { Check, Sparkles } from "lucide-react";
 import type { CSSProperties } from "react";
 import { getDailyPlantStage } from "../lib/game";
+import { toPersianDigits, toPersianPercent } from "../lib/format";
 import type { PaletteId, PlantStage } from "../types/game";
 import { ApricityAvatar } from "./ApricityAvatar";
 import { PlantArtwork } from "./PlantArtwork";
@@ -46,8 +47,8 @@ export function GrowthScene({ completedCount, target, totalWins, avatarSeed, pal
         <h2 id="growth-title">باغت آرام‌آرام رشد می‌کند</h2>
         <p>{message}</p>
         <div className="growth-facts">
-          <span><strong>{completedCount}</strong> از {target} قدم</span>
-          <span><strong>{totalWins}</strong> شکوفه‌ی قبلی</span>
+          <span><strong>{toPersianDigits(completedCount)}</strong> از {toPersianDigits(target)} قدم</span>
+          <span><strong>{toPersianDigits(totalWins)}</strong> شکوفه‌ی قبلی</span>
         </div>
         <div className="growth-stage"><span className="growth-stage__dot" /> {STAGE_LABELS[stage]}</div>
       </div>
@@ -59,7 +60,7 @@ export function GrowthScene({ completedCount, target, totalWins, avatarSeed, pal
             {isComplete && <span className="growth-check" aria-label="روز موفق"><Check size={18} /></span>}
           </div>
         </div>
-        <span className="growth-percent">{progress}%</span>
+        <span className="growth-percent">{toPersianPercent(progress)}</span>
       </div>
     </section>
   );

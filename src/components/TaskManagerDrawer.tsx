@@ -1,6 +1,7 @@
 import { Plus, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { TaskDefinition, TaskIconKey } from "../types/game";
+import { toPersianDigits } from "../lib/format";
 import { TASK_ICON_OPTIONS, TaskIcon } from "./taskIcons";
 
 interface TaskManagerDrawerProps {
@@ -126,7 +127,7 @@ export function TaskManagerDrawer({ open, tasks, onClose, onAdd, onRemove }: Tas
 
         <div className="task-list-heading">
           <span className="field-label">کارهای باغ</span>
-          <span className="tiny-badge">{tasks.length} کار</span>
+          <span className="tiny-badge">{toPersianDigits(tasks.length)} کار</span>
         </div>
         <div className="task-list">
           {tasks.length > 0 ? tasks.map((task) => (

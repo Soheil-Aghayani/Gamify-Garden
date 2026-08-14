@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getDayKey } from "./lib/date";
+import { toPersianDigits } from "./lib/format";
 import {
   addTask,
   addReward,
@@ -118,7 +119,7 @@ export default function App() {
       showToast("باغ امروز شکوفه زد؛ آفرین بهت ✨");
     } else if (nextToday.completedQuestIds.length > today.completedQuestIds.length) {
       const remaining = target - nextToday.completedQuestIds.length;
-      showToast(remaining > 0 ? `${remaining} قدم کوچیک دیگه تا شکوفه 🌱` : "قدم قشنگی بود 🌱");
+      showToast(remaining > 0 ? `${toPersianDigits(remaining)} قدم کوچیک دیگه تا شکوفه 🌱` : "قدم قشنگی بود 🌱");
     }
     setGameState(result.state);
   };

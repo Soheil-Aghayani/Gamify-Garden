@@ -1,5 +1,6 @@
 import { BookOpen, Heart, Settings2, Sparkles, Trophy } from "lucide-react";
 import type { PaletteId, PlantStage } from "../types/game";
+import { toPersianDigits } from "../lib/format";
 import { ApricityAvatar } from "./ApricityAvatar";
 
 interface GardenHeaderProps {
@@ -42,11 +43,11 @@ export function GardenHeader({
         <div className="stats-row" aria-label="آمار باغ">
           <div className="mini-stat">
             <span className="mini-stat__icon mini-stat__icon--sun" aria-hidden="true"><Trophy size={16} /></span>
-            <span><strong>{totalWins}</strong><small>برد</small></span>
+            <span><strong>{toPersianDigits(totalWins)}</strong><small>برد</small></span>
           </div>
           <div className="mini-stat">
             <span className="mini-stat__icon mini-stat__icon--leaf" aria-hidden="true"><Sparkles size={16} /></span>
-            <span><strong>{gentleStreak}</strong><small>روز نرم</small></span>
+            <span><strong>{toPersianDigits(gentleStreak)}</strong><small>روز نرم</small></span>
           </div>
         </div>
         <div className="header-actions">

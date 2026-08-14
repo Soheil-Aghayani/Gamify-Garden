@@ -1,5 +1,6 @@
 import { Check, Gift, Heart, Sparkles } from "lucide-react";
 import type { Ref } from "react";
+import { toPersianDigits } from "../lib/format";
 
 interface RewardBannerProps {
   dailyWin: boolean;
@@ -26,7 +27,7 @@ export function RewardBanner({ dailyWin, target, rewards, selectedReward, isNext
       </div>
       <div className="reward-card__content">
         <p className="eyebrow">جایزه‌ی مهربانانه</p>
-        <h2 id="reward-title">{isDone ? "امروز همین‌قدر کافی بود 🌤️" : dailyWin ? "امروز را بردی ✨" : emptyGarden ? "اول یک کار به باغ اضافه کن" : `${target} قدم، یک جایزه‌ی کوچیک`}</h2>
+        <h2 id="reward-title">{isDone ? "امروز همین‌قدر کافی بود 🌤️" : dailyWin ? "امروز را بردی ✨" : emptyGarden ? "اول یک کار به باغ اضافه کن" : `${toPersianDigits(target)} قدم، یک جایزه‌ی کوچیک`}</h2>
         <p>{isDone ? `انتخابت: ${selectedReward}` : dailyWin ? "یکی را برای خودت انتخاب کن؛ واقعاً حقته." : emptyGarden ? "هر چیزی که دوست داری می‌تواند اولین جوانه باشد." : "لازم نیست بزرگ باشد؛ فقط چیزی که حالت را خوب کند."}</p>
         {dailyWin && (
           <div className="reward-options" role="group" aria-label="انتخاب جایزه">
