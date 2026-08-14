@@ -29,6 +29,7 @@ import { RewardBanner } from "./components/RewardBanner";
 import { SettingsDrawer } from "./components/SettingsDrawer";
 import { TaskManagerDrawer } from "./components/TaskManagerDrawer";
 import { WeekMemory } from "./components/WeekMemory";
+import { useBodyScrollLock } from "./hooks/useBodyScrollLock";
 import { useInstallPrompt } from "./hooks/useInstallPrompt";
 import "./styles.css";
 
@@ -61,6 +62,9 @@ export default function App() {
   const todaySummary = getPersianDateSummary();
   const dailyAvatar = getDailyAvatar(gameState.profile.avatarSeed, todayKey);
   const installPrompt = useInstallPrompt();
+  const isDrawerOpen = guideOpen || settingsOpen || taskManagerOpen;
+
+  useBodyScrollLock(isDrawerOpen);
 
   useEffect(() => {
     saveGameState(gameState);

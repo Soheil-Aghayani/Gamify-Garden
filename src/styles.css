@@ -1229,6 +1229,8 @@ input:focus-visible {
   inset: 0;
   display: flex;
   justify-content: flex-start;
+  overflow: hidden;
+  overscroll-behavior: none;
   background: rgba(71, 58, 82, 0.23);
   backdrop-filter: blur(5px);
   animation: fade-in 180ms ease both;
@@ -1242,6 +1244,9 @@ input:focus-visible {
   min-height: 100%;
   padding: 1.5rem;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   color: var(--ink);
   background: var(--surface-strong);
   box-shadow: 20px 0 60px rgba(67, 52, 79, 0.2);
