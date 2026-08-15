@@ -18,18 +18,18 @@ interface PixelGardenMapProps {
 const ALL_SLOT_IDS = Array.from({ length: 12 }, (_, index) => `plot-${index + 1}`);
 
 const SOIL_PLOT_POSITIONS = [
-  { left: "2%", top: "8%" },
-  { left: "20%", top: "8%" },
-  { left: "38%", top: "8%" },
-  { left: "56%", top: "8%" },
-  { left: "74%", top: "8%" },
-  { left: "92%", top: "8%" },
-  { left: "2%", top: "55%" },
-  { left: "20%", top: "55%" },
-  { left: "38%", top: "55%" },
-  { left: "56%", top: "55%" },
-  { left: "74%", top: "55%" },
-  { left: "92%", top: "55%" },
+  { left: "8%", top: "25%" },
+  { left: "24%", top: "25%" },
+  { left: "40%", top: "25%" },
+  { left: "56%", top: "25%" },
+  { left: "72%", top: "25%" },
+  { left: "88%", top: "25%" },
+  { left: "8%", top: "75%" },
+  { left: "24%", top: "75%" },
+  { left: "40%", top: "75%" },
+  { left: "56%", top: "75%" },
+  { left: "72%", top: "75%" },
+  { left: "88%", top: "75%" },
 ] as const;
 
 function plotStyle(index: number): CSSProperties {
@@ -50,7 +50,7 @@ export function PixelGardenMap({
   onSlotClick,
 }: PixelGardenMapProps) {
   return (
-    <div className="pixel-garden-map" aria-label="نقشه‌ی باغ Apricity">
+    <div className="pixel-garden-map pixel-garden-map--cozy" aria-label="نقشه‌ی باغ Apricity">
       <div className="pixel-garden-map__grass" aria-hidden="true">
         <span className="pixel-garden-map__sun-patch" />
         <span className="pixel-garden-map__path pixel-garden-map__path--main" />
