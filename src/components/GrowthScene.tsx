@@ -66,7 +66,7 @@ export function GrowthScene({ completedCount, target, totalWins, mood, avatarSee
       <div className="growth-visual">
         <div className="growth-ring" style={{ "--progress": `${progress}%` } as CSSProperties}>
           <div className="growth-ring__inner">
-            <PlantArtwork stage={stage} />
+            <PlantArtwork stage={stage} idPrefix="growth-plant" />
             {isComplete && <span className="growth-check" aria-label="روز موفق"><Check size={18} /></span>}
           </div>
         </div>

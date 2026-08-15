@@ -57,6 +57,7 @@ export interface GameState {
   lifetimeWins: number;
   gentleStreak: number;
   plantStage: PlantStage;
+  gardenPlantStage: PlantStage;
   hasSeenIntro: boolean;
   rewards: string[];
   rewardCatalogVersion: number;

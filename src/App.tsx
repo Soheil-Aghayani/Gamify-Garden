@@ -286,7 +286,7 @@ export default function App() {
             avatarVariant={dailyAvatar.variant}
             palette={gameState.profile.palette}
           />
-          <GardenDecor lifetimeWins={gameState.lifetimeWins} />
+          <GardenDecor lifetimeWins={gameState.lifetimeWins} gardenPlantStage={gameState.gardenPlantStage} />
           <WeekMemory days={gameState.days} todayKey={todayKey} />
           <QuestGrid
             quests={gameState.tasks}

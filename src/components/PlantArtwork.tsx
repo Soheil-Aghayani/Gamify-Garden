@@ -1,7 +1,9 @@
+import type { CSSProperties } from "react";
 import type { PlantStage } from "../types/game";
 
 interface PlantArtworkProps {
   stage: PlantStage;
+  idPrefix?: string;
 }
 
 const STAGE_LABELS: Record<PlantStage, string> = {
@@ -11,20 +13,28 @@ const STAGE_LABELS: Record<PlantStage, string> = {
   tree: "یک درخت کوچولوی قوی",
 };
 
-export function PlantArtwork({ stage }: PlantArtworkProps) {
+export function PlantArtwork({ stage, idPrefix = "plant" }: PlantArtworkProps) {
+  const leafGradientId = `${idPrefix}-leaf-gradient`;
+  const petalGradientId = `${idPrefix}-petal-gradient`;
+  const artworkStyle = {
+    "--plant-leaf-gradient": `url(#${leafGradientId})`,
+    "--plant-petal-gradient": `url(#${petalGradientId})`,
+  } as CSSProperties;
+
   return (
     <svg
       className={`plant-art plant-art--${stage}`}
       viewBox="0 0 280 220"
+      style={artworkStyle}
       role="img"
       aria-label={STAGE_LABELS[stage]}
     >
       <defs>
-        <linearGradient id="plantLeafGradient" x1="0" x2="1" y1="0" y2="1">
+        <linearGradient id={leafGradientId} x1="0" x2="1" y1="0" y2="1">
           <stop offset="0" stopColor="var(--plant-leaf-light)" />
           <stop offset="1" stopColor="var(--plant-leaf)" />
         </linearGradient>
-        <linearGradient id="plantPetalGradient" x1="0" x2="1" y1="0" y2="1">
+        <linearGradient id={petalGradientId} x1="0" x2="1" y1="0" y2="1">
           <stop offset="0" stopColor="var(--plant-petal-light)" />
           <stop offset="1" stopColor="var(--plant-petal)" />
         </linearGradient>

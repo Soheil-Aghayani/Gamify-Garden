@@ -1037,11 +1037,11 @@ input:focus-visible {
 }
 
 .plant-leaf {
-  fill: url(#plantLeafGradient);
+  fill: var(--plant-leaf-gradient);
 }
 
 .plant-petal {
-  fill: url(#plantPetalGradient);
+  fill: var(--plant-petal-gradient);
 }
 
 .plant-center,
@@ -1054,7 +1054,7 @@ input:focus-visible {
 }
 
 .plant-canopy {
-  fill: url(#plantLeafGradient);
+  fill: var(--plant-leaf-gradient);
 }
 
 .plant-canopy--two,
@@ -1154,47 +1154,168 @@ input:focus-visible {
 
 .decor-card__scene {
   position: relative;
-  min-height: 5.1rem;
+  min-height: 8.2rem;
   overflow: hidden;
+  isolation: isolate;
   background:
-    radial-gradient(circle at 75% 12%, color-mix(in srgb, var(--sun) 42%, transparent), transparent 4rem),
-    linear-gradient(180deg, color-mix(in srgb, var(--lavender) 42%, var(--surface-solid)), color-mix(in srgb, var(--primary-soft) 58%, var(--surface-solid)));
+    radial-gradient(circle at 82% 12%, color-mix(in srgb, var(--sun) 48%, transparent), transparent 4.5rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--lavender) 48%, var(--surface-solid)), color-mix(in srgb, var(--primary-soft) 72%, var(--surface-solid)));
   border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
   border-radius: 1.25rem;
+  transition: min-height 500ms ease, background 700ms ease;
 }
 
-.decor-card__scene::before {
+.decor-card__scene--level-0 {
+  min-height: 7rem;
+}
+
+.decor-card__scene--level-1 {
+  min-height: 8rem;
+}
+
+.decor-card__scene--level-2 {
+  min-height: 8.8rem;
+}
+
+.decor-card__scene--level-3 {
+  min-height: 9.5rem;
+}
+
+.decor-card__scene--level-4,
+.decor-card__scene--level-5 {
+  min-height: 10.2rem;
+}
+
+.app-shell[data-theme="dark"] .decor-card__scene {
+  background:
+    radial-gradient(circle at 82% 12%, color-mix(in srgb, var(--sun) 34%, transparent), transparent 4.5rem),
+    linear-gradient(180deg, color-mix(in srgb, #3d4261 78%, var(--surface-solid)), color-mix(in srgb, var(--primary-soft) 62%, var(--surface-solid)));
+}
+
+.decor-card__scene-sun {
+  position: absolute;
+  z-index: 0;
+  width: 2.8rem;
+  height: 2.8rem;
+  inset: 0.9rem auto auto 1.2rem;
+  background: color-mix(in srgb, var(--sun) 76%, white);
+  border-radius: 50%;
+  box-shadow: 0 0 1.8rem color-mix(in srgb, var(--sun) 42%, transparent);
+  opacity: 0.82;
+}
+
+.decor-card__scene-cloud {
+  position: absolute;
+  z-index: 1;
+  width: 4.6rem;
+  height: 0.7rem;
+  inset: 1.4rem 23% auto auto;
+  background: color-mix(in srgb, white 56%, transparent);
+  border-radius: 999px;
+  opacity: 0.75;
+  animation: garden-cloud 7s ease-in-out infinite alternate;
+}
+
+.decor-card__scene-cloud::before,
+.decor-card__scene-cloud::after {
   content: "";
   position: absolute;
-  width: 120%;
-  height: 3rem;
-  inset: auto -10% -2rem auto;
-  background: color-mix(in srgb, var(--plant-leaf-light) 48%, transparent);
+  bottom: 0.1rem;
+  background: inherit;
   border-radius: 50%;
+}
+
+.decor-card__scene-cloud::before {
+  width: 1.35rem;
+  height: 1.35rem;
+  inset-inline-start: 0.75rem;
+}
+
+.decor-card__scene-cloud::after {
+  width: 1rem;
+  height: 1rem;
+  inset-inline-start: 2rem;
+}
+
+.decor-card__scene-cloud--two {
+  inset: 2.4rem 8% auto auto;
+  transform: scale(0.72);
+  opacity: 0.38;
+  animation-delay: -2.5s;
+}
+
+.decor-card__scene-hill {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.decor-card__scene-hill--back {
+  z-index: 1;
+  width: 84%;
+  height: 4.2rem;
+  inset: auto -8% 1.05rem auto;
+  background: color-mix(in srgb, var(--lavender) 55%, var(--plant-leaf-light));
   transform: rotate(-3deg);
 }
 
-.decor-card__scene::after {
-  content: "";
+.decor-card__scene-hill--front {
+  z-index: 2;
+  width: 125%;
+  height: 4.6rem;
+  inset: auto -13% -2.55rem auto;
+  background: color-mix(in srgb, var(--plant-leaf-light) 64%, var(--primary-soft));
+  transform: rotate(-2deg);
+}
+
+.decor-card__scene-path {
   position: absolute;
-  width: 9rem;
-  height: 1.6rem;
-  inset: auto 35% 0.55rem auto;
-  background: color-mix(in srgb, var(--plant-trunk) 22%, transparent);
+  z-index: 2;
+  width: 5.8rem;
+  height: 4.6rem;
+  inset: auto 42% -2.85rem auto;
+  background: color-mix(in srgb, var(--plant-trunk) 20%, var(--surface-solid));
   border-radius: 50%;
+  transform: rotate(-5deg);
 }
 
-.decor-card__seed,
-.decor-card__scene-item,
-.decor-card__scene-hint {
+.decor-card__scene-plant {
   position: absolute;
-  z-index: 1;
+  z-index: 3;
+  width: 7.4rem;
+  inset: auto 50% -1.65rem auto;
+  filter: drop-shadow(0 0.45rem 0.3rem rgba(67, 52, 79, 0.13));
+  transform: translateX(50%);
+  transform-origin: center bottom;
+  animation: garden-grow 650ms cubic-bezier(0.2, 0.85, 0.25, 1.15) both;
 }
 
-.decor-card__seed {
-  inset: auto 49% 0.95rem auto;
-  font-size: 1.55rem;
-  filter: drop-shadow(0 0.25rem 0.2rem rgba(67, 52, 79, 0.12));
+.decor-card__scene-plant .plant-art {
+  width: 100%;
+}
+
+.decor-card__scene--seed .decor-card__scene-plant {
+  width: 5rem;
+  bottom: -1.05rem;
+}
+
+.decor-card__scene--sprout .decor-card__scene-plant {
+  width: 6.2rem;
+}
+
+.decor-card__scene--flower .decor-card__scene-plant {
+  width: 7.3rem;
+}
+
+.decor-card__scene--tree .decor-card__scene-plant {
+  width: 11.4rem;
+  bottom: -2.55rem;
+}
+
+.decor-card__scene-item,
+.decor-card__scene-note {
+  position: absolute;
+  z-index: 4;
 }
 
 .decor-card__scene-item {
@@ -1205,40 +1326,44 @@ input:focus-visible {
 }
 
 .decor-card__scene-item--flower {
-  inset: auto 18% 0.75rem auto;
+  inset: auto 16% 1.25rem auto;
 }
 
 .decor-card__scene-item--butterfly {
-  inset: 0.8rem 29% auto auto;
+  inset: 1.25rem 31% auto auto;
   font-size: 1.2rem;
   animation-delay: 80ms;
 }
 
 .decor-card__scene-item--bench {
-  inset: auto 62% 0.8rem auto;
+  inset: auto auto 1.3rem 8%;
   font-size: 1.7rem;
   animation-delay: 140ms;
 }
 
 .decor-card__scene-item--lamp {
-  inset: 0.8rem 48% auto auto;
+  inset: 1.25rem 48% auto auto;
   font-size: 1.25rem;
   animation-delay: 200ms;
 }
 
 .decor-card__scene-item--cat {
-  inset: auto 8% 0.75rem auto;
+  inset: auto 7% 1.15rem auto;
   font-size: 1.55rem;
   animation-delay: 260ms;
 }
 
-.decor-card__scene-hint {
-  inset: 50% auto auto 50%;
-  width: max-content;
-  max-width: calc(100% - 2rem);
-  color: var(--muted);
-  font-size: 0.68rem;
-  transform: translate(-50%, -50%);
+.decor-card__scene-note {
+  inset: 0.7rem auto auto 0.85rem;
+  max-width: 47%;
+  padding: 0.28rem 0.5rem;
+  color: var(--primary-deep);
+  background: color-mix(in srgb, var(--surface-solid) 62%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
+  border-radius: 999px;
+  font-size: 0.56rem;
+  line-height: 1.6;
+  text-align: center;
 }
 
 .decor-card__collection {
@@ -2452,6 +2577,16 @@ input:focus-visible {
   to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
 }
 
+@keyframes garden-grow {
+  from { opacity: 0; transform: translateX(50%) translateY(0.5rem) scale(0.82); }
+  to { opacity: 1; transform: translateX(50%) translateY(0) scale(1); }
+}
+
+@keyframes garden-cloud {
+  from { margin-inline-start: -0.35rem; }
+  to { margin-inline-start: 0.35rem; }
+}
+
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -2659,7 +2794,25 @@ input:focus-visible {
   }
 
   .decor-card__scene {
-    min-height: 4.6rem;
+    min-height: 7.2rem;
+  }
+
+  .decor-card__scene--level-1 {
+    min-height: 7.8rem;
+  }
+
+  .decor-card__scene--level-2,
+  .decor-card__scene--level-3 {
+    min-height: 8.6rem;
+  }
+
+  .decor-card__scene--level-4,
+  .decor-card__scene--level-5 {
+    min-height: 9.3rem;
+  }
+
+  .decor-card__scene--tree .decor-card__scene-plant {
+    width: 10rem;
   }
 
   .decor-card__collection {

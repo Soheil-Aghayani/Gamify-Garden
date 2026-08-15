@@ -1,7 +1,7 @@
 import { DEFAULT_TASKS } from "../data/quests";
 import { DEFAULT_REWARDS, REWARD_CATALOG_VERSION } from "../data/rewards";
 import { createInitialState, recalculateStats } from "./game";
-import type { DailyState, GameState, MoodLevel, PaletteId, QuestId, TaskDefinition, TaskIconKey, ThemeMode } from "../types/game";
+import type { DailyState, GameState, MoodLevel, PaletteId, PlantStage, QuestId, TaskDefinition, TaskIconKey, ThemeMode } from "../types/game";
 
 export const STORAGE_KEY = "gamify-garden:v1";
 
@@ -33,6 +33,10 @@ function isThemeMode(value: unknown): value is ThemeMode {
 
 function isMoodLevel(value: unknown): value is MoodLevel {
   return value === "tired" || value === "calm" || value === "low" || value === "energized";
+}
+
+function isPlantStage(value: unknown): value is PlantStage {
+  return value === "seed" || value === "sprout" || value === "flower" || value === "tree";
 }
 
 function isTaskIconKey(value: unknown): value is TaskIconKey {
@@ -146,6 +150,11 @@ function normalizeState(value: unknown): GameState {
     : typeof candidate.totalWins === "number" && Number.isFinite(candidate.totalWins)
       ? Math.max(0, Math.floor(candidate.totalWins))
       : 0;
+  const savedGardenPlantStage = isPlantStage(candidate.gardenPlantStage)
+    ? candidate.gardenPlantStage
+    : Object.values(days).some((day) => day.dailyWin)
+      ? "tree"
+      : isPlantStage(candidate.plantStage) ? candidate.plantStage : initial.gardenPlantStage;
 
   return recalculateStats({
     ...initial,
@@ -162,6 +171,7 @@ function normalizeState(value: unknown): GameState {
     tasks: safeTasks,
     days,
     lifetimeWins: savedLifetimeWins,
+    gardenPlantStage: savedGardenPlantStage,
     hasSeenIntro: typeof candidate.hasSeenIntro === "boolean" ? candidate.hasSeenIntro : true,
     rewards: rewards.length > 0 ? rewards : [...DEFAULT_REWARDS],
     rewardCatalogVersion: REWARD_CATALOG_VERSION,

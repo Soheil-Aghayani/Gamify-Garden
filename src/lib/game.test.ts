@@ -173,11 +173,13 @@ describe("Gamify Garden game rules", () => {
     expect(state.totalWins).toBe(1);
     expect(state.lifetimeWins).toBe(1);
     expect(state.plantStage).toBe("sprout");
+    expect(state.gardenPlantStage).toBe("tree");
 
     state = toggleQuest(state, QUESTS[0], DAY).state;
     expect(state.totalWins).toBe(0);
     expect(state.lifetimeWins).toBe(1);
     expect(state.plantStage).toBe("sprout");
+    expect(state.gardenPlantStage).toBe("tree");
   });
 
   it("remembers opened love capsules without duplicates", () => {

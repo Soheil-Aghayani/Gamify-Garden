@@ -49,6 +49,7 @@ export function createInitialState(): GameState {
     lifetimeWins: 0,
     gentleStreak: 0,
     plantStage: "seed",
+    gardenPlantStage: "seed",
     hasSeenIntro: false,
     rewards: [...DEFAULT_REWARDS],
     rewardCatalogVersion: REWARD_CATALOG_VERSION,
@@ -119,6 +120,18 @@ export function getLongTermPlantStage(totalWins: number): PlantStage {
   return "seed";
 }
 
+function isPlantStage(value: unknown): value is PlantStage {
+  return value === "seed" || value === "sprout" || value === "flower" || value === "tree";
+}
+
+function getPlantStageRank(stage: PlantStage): number {
+  return { seed: 0, sprout: 1, flower: 2, tree: 3 }[stage];
+}
+
+function getMoreMaturePlantStage(left: PlantStage, right: PlantStage): PlantStage {
+  return getPlantStageRank(left) >= getPlantStageRank(right) ? left : right;
+}
+
 function getGentleStreak(days: Record<string, DailyState>): number {
   const winningDays = Object.values(days)
     .filter((day) => day.dailyWin)
@@ -139,12 +152,18 @@ export function recalculateStats(state: GameState): GameState {
   const totalWins = Object.values(state.days).filter((day) => day.dailyWin).length;
   const previousLifetimeWins = Number.isFinite(state.lifetimeWins) ? state.lifetimeWins : 0;
   const lifetimeWins = Math.max(previousLifetimeWins, totalWins);
+  const longTermStage = getLongTermPlantStage(lifetimeWins);
+  const savedGardenStage = isPlantStage(state.gardenPlantStage) ? state.gardenPlantStage : "seed";
+  const gardenPlantStage = Object.values(state.days).some((day) => day.dailyWin)
+    ? "tree"
+    : getMoreMaturePlantStage(savedGardenStage, longTermStage);
   return {
     ...state,
     totalWins,
     lifetimeWins,
     gentleStreak: getGentleStreak(state.days),
-    plantStage: getLongTermPlantStage(lifetimeWins),
+    plantStage: longTermStage,
+    gardenPlantStage,
   };
 }
 
@@ -196,6 +215,7 @@ export function toggleQuest(
   return {
     state: recalculateStats({
       ...state,
+      gardenPlantStage: nextDay.dailyWin ? "tree" : state.gardenPlantStage,
       days: {
         ...state.days,
         [dayKey]: nextDay,
