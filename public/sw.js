@@ -1,4 +1,4 @@
-const CACHE_NAME = "apricity-shell-v2";
+const CACHE_NAME = "apricity-shell-v3";
 const APP_SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./icon-192.svg", "./icon-512.svg"];
 
 self.addEventListener("install", (event) => {
@@ -10,7 +10,15 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys()
+      .then((cacheNames) => Promise.all(
+        cacheNames
+          .filter((cacheName) => cacheName.startsWith("apricity-shell-") && cacheName !== CACHE_NAME)
+          .map((cacheName) => caches.delete(cacheName)),
+      ))
+      .then(() => self.clients.claim()),
+  );
 });
 
 self.addEventListener("fetch", (event) => {
