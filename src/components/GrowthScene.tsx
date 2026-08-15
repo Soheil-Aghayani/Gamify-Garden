@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import { getDailyPlantStage } from "../lib/game";
 import type { AvatarVariant } from "../lib/avatar";
 import { toPersianDigits, toPersianPercent } from "../lib/format";
-import type { PaletteId, PlantStage } from "../types/game";
+import type { MoodLevel, PaletteId, PlantStage } from "../types/game";
 import { ApricityAvatar } from "./ApricityAvatar";
 import { PlantArtwork } from "./PlantArtwork";
 
@@ -11,6 +11,7 @@ interface GrowthSceneProps {
   completedCount: number;
   target: number;
   totalWins: number;
+  mood: MoodLevel;
   avatarSeed: string;
   avatarVariant: AvatarVariant;
   palette: PaletteId;
@@ -23,19 +24,26 @@ const STAGE_LABELS: Record<PlantStage, string> = {
   tree: "درخت",
 };
 
-export function GrowthScene({ completedCount, target, totalWins, avatarSeed, avatarVariant, palette }: GrowthSceneProps) {
+const MOOD_MESSAGES: Record<MoodLevel, string> = {
+  tired: "امروز با خودت آهسته و مهربان می‌ریم.",
+  calm: "این آرامش را به یک قدم کوچک تبدیل کن.",
+  low: "لازم نیست حوصله‌اش را داشته باشی؛ فقط یک شروع خیلی کوچیک.",
+  energized: "اگر انرژی داری، بگذار یک قدم قشنگ باغت را روشن‌تر کند.",
+};
+
+export function GrowthScene({ completedCount, target, totalWins, mood, avatarSeed, avatarVariant, palette }: GrowthSceneProps) {
   const stage = getDailyPlantStage(completedCount, target);
   const progress = target === 0 ? 0 : Math.min(100, Math.round((completedCount / target) * 100));
   const isComplete = target > 0 && completedCount >= target;
   const message = target === 0
-    ? "اول یک مأموریت برای باغت بساز"
-    : isComplete
-      ? "امروز باغت شکوفه زد"
-      : completedCount === target - 1
-        ? "فقط یک قدم تا شکوفه"
-        : completedCount === 1
-          ? "جوانه‌اش را دیدی"
-          : "یک قدم کوچک بردار";
+      ? "اول یک مأموریت برای باغت بساز"
+      : isComplete
+        ? "امروز باغت شکوفه زد"
+        : completedCount === target - 1
+          ? `${MOOD_MESSAGES[mood]} فقط یک قدم تا شکوفه.`
+          : completedCount === 1
+            ? `${MOOD_MESSAGES[mood]} جوانه‌اش را دیدی.`
+            : MOOD_MESSAGES[mood];
 
   return (
     <section className={`growth-card soft-card${isComplete ? " is-blooming" : ""}`} aria-labelledby="growth-title" aria-live="polite">

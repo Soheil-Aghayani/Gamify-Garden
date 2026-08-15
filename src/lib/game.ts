@@ -6,6 +6,7 @@ import type {
   EnergyLevel,
   FlowStep,
   GameState,
+  MoodLevel,
   PlantStage,
   Profile,
   QuestId,
@@ -13,6 +14,13 @@ import type {
 } from "../types/game";
 
 export const DAILY_TARGET = 3;
+
+export const MOOD_TO_ENERGY: Record<MoodLevel, EnergyLevel> = {
+  tired: 1,
+  calm: 2,
+  low: 1,
+  energized: 3,
+};
 
 export const DEFAULT_PROFILE: Profile = {
   displayName: "فاطمه",
@@ -38,6 +46,7 @@ export function createInitialState(): GameState {
     tasks: DEFAULT_TASKS.map((task) => ({ ...task, energyCopy: { ...task.energyCopy } })),
     days: {},
     totalWins: 0,
+    lifetimeWins: 0,
     gentleStreak: 0,
     plantStage: "seed",
     hasSeenIntro: false,
@@ -53,6 +62,13 @@ export function getDayState(state: GameState, dayKey = getDayKey()): DailyState 
 
 export function getDailyTarget(state: GameState): number {
   return Math.min(DAILY_TARGET, state.tasks.length);
+}
+
+export function getMoodForDay(day: DailyState): MoodLevel {
+  if (day.mood) return day.mood;
+  if (day.energy === 3) return "energized";
+  if (day.energy === 2) return "calm";
+  return "calm";
 }
 
 function hashValue(value: string): number {
@@ -121,11 +137,14 @@ function getGentleStreak(days: Record<string, DailyState>): number {
 
 export function recalculateStats(state: GameState): GameState {
   const totalWins = Object.values(state.days).filter((day) => day.dailyWin).length;
+  const previousLifetimeWins = Number.isFinite(state.lifetimeWins) ? state.lifetimeWins : 0;
+  const lifetimeWins = Math.max(previousLifetimeWins, totalWins);
   return {
     ...state,
     totalWins,
+    lifetimeWins,
     gentleStreak: getGentleStreak(state.days),
-    plantStage: getLongTermPlantStage(totalWins),
+    plantStage: getLongTermPlantStage(lifetimeWins),
   };
 }
 
@@ -246,6 +265,19 @@ export function setTodayEnergy(
   dayKey = getDayKey(),
 ): GameState {
   return updateToday(state, (day) => ({ ...day, energy, energyConfirmed: true }), dayKey);
+}
+
+export function setTodayMood(
+  state: GameState,
+  mood: MoodLevel,
+  dayKey = getDayKey(),
+): GameState {
+  return updateToday(state, (day) => ({
+    ...day,
+    mood,
+    energy: MOOD_TO_ENERGY[mood],
+    energyConfirmed: true,
+  }), dayKey);
 }
 
 export function markIntroSeen(state: GameState): GameState {

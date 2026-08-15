@@ -16,6 +16,16 @@ export function getPersianGreeting(date = new Date()): string {
   return "شبت بخیر";
 }
 
+export type SkyPhase = "dawn" | "day" | "sunset" | "night";
+
+export function getSkyPhase(date = new Date()): SkyPhase {
+  const hour = date.getHours();
+  if (hour < 9) return "dawn";
+  if (hour < 17) return "day";
+  if (hour < 21) return "sunset";
+  return "night";
+}
+
 export interface PersianDateSummary {
   weekday: string;
   date: string;

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getDailyAvatar } from "./lib/avatar";
-import { getDayKey, getPersianDateSummary, getPersianGreeting } from "./lib/date";
+import { getDayKey, getPersianDateSummary, getPersianGreeting, getSkyPhase } from "./lib/date";
 import { toPersianDigits } from "./lib/format";
 import {
   addTask,
@@ -8,20 +8,22 @@ import {
   getDailyTarget,
   getDayState,
   getFlowStep,
+  getMoodForDay,
   markIntroSeen,
   openLoveCapsule,
   removeTask,
   removeReward,
   restoreTask,
   setProfile,
-  setTodayEnergy,
+  setTodayMood,
   setTodayReward,
   toggleQuest,
 } from "./lib/game";
 import { loadGameState, saveGameState } from "./lib/storage";
-import type { EnergyLevel, FlowStep, GameState, Profile, QuestId, TaskDefinition } from "./types/game";
+import type { FlowStep, GameState, MoodLevel, Profile, QuestId, TaskDefinition } from "./types/game";
 import { EnergyPicker } from "./components/EnergyPicker";
 import { GardenHeader } from "./components/GardenHeader";
+import { GardenDecor } from "./components/GardenDecor";
 import { GrowthScene } from "./components/GrowthScene";
 import { GuideDrawer } from "./components/GuideDrawer";
 import { InstallPrompt } from "./components/InstallPrompt";
@@ -29,6 +31,7 @@ import { LoveCapsule } from "./components/LoveCapsule";
 import { QuestGrid } from "./components/QuestGrid";
 import { RewardBanner } from "./components/RewardBanner";
 import { SettingsDrawer } from "./components/SettingsDrawer";
+import { SkyBackdrop } from "./components/SkyBackdrop";
 import { TaskManagerDrawer } from "./components/TaskManagerDrawer";
 import { WeekMemory } from "./components/WeekMemory";
 import { useBodyScrollLock } from "./hooks/useBodyScrollLock";
@@ -68,11 +71,14 @@ export default function App() {
   const loveCapsuleRef = useRef<HTMLElement | null>(null);
   const previousFlowStep = useRef<FlowStep | null>(null);
   const today = getDayState(gameState, todayKey);
+  const todayMood = getMoodForDay(today);
   const target = getDailyTarget(gameState);
   const flowStep = getFlowStep(gameState, todayKey);
   const todaySummary = getPersianDateSummary(currentTime);
   const greeting = getPersianGreeting(currentTime);
+  const skyPhase = getSkyPhase(currentTime);
   const dailyAvatar = getDailyAvatar(gameState.profile.avatarSeed, todayKey);
+  const moodAvatarSeed = `${dailyAvatar.seed}:${todayMood}`;
   const installPrompt = useInstallPrompt();
   const isDrawerOpen = guideOpen || settingsOpen || taskManagerOpen;
   const resolvedTheme = gameState.profile.theme === "system"
@@ -159,8 +165,8 @@ export default function App() {
     setGuideOpen(false);
   };
 
-  const handleEnergyChange = (energy: EnergyLevel) => {
-    setGameState((current) => setTodayEnergy(current, energy, todayKey));
+  const handleMoodChange = (mood: MoodLevel) => {
+    setGameState((current) => setTodayMood(current, mood, todayKey));
   };
 
   const handleQuestToggle = (questId: QuestId) => {
@@ -232,6 +238,8 @@ export default function App() {
       className="app-shell"
       data-palette={gameState.profile.palette}
       data-theme={resolvedTheme}
+      data-mood={todayMood}
+      data-sky={skyPhase}
       onContextMenu={(event) => {
         const target = event.target as HTMLElement;
         if (!target.closest("input, textarea, [contenteditable='true']")) event.preventDefault();
@@ -241,6 +249,7 @@ export default function App() {
         if (!target.closest("input, textarea, [contenteditable='true']")) event.preventDefault();
       }}
     >
+      <SkyBackdrop phase={skyPhase} />
       <div className="background-orb background-orb--one" aria-hidden="true" />
       <div className="background-orb background-orb--two" aria-hidden="true" />
       <main className="page-shell">
@@ -248,7 +257,7 @@ export default function App() {
           displayName={gameState.profile.displayName}
           greeting={greeting}
           nickname={gameState.profile.nickname}
-          avatarSeed={dailyAvatar.seed}
+          avatarSeed={moodAvatarSeed}
           avatarVariant={dailyAvatar.variant}
           palette={gameState.profile.palette}
           plantStage={gameState.plantStage}
@@ -262,20 +271,22 @@ export default function App() {
 
         <div className="page-content">
           <EnergyPicker
-            value={today.energy}
+            value={todayMood}
             confirmed={today.energyConfirmed}
             isNext={flowStep === "energy"}
             sectionRef={energyRef}
-            onChange={handleEnergyChange}
+            onChange={handleMoodChange}
           />
           <GrowthScene
             completedCount={today.completedQuestIds.length}
             target={target}
             totalWins={gameState.totalWins}
-            avatarSeed={dailyAvatar.seed}
+            mood={todayMood}
+            avatarSeed={moodAvatarSeed}
             avatarVariant={dailyAvatar.variant}
             palette={gameState.profile.palette}
           />
+          <GardenDecor lifetimeWins={gameState.lifetimeWins} />
           <WeekMemory days={gameState.days} todayKey={todayKey} />
           <QuestGrid
             quests={gameState.tasks}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getDailyAvatar } from "./avatar";
-import { getPersianDateSummary, getPersianGreeting } from "./date";
+import { getPersianDateSummary, getPersianGreeting, getSkyPhase } from "./date";
 import { getDailyRewardOptions } from "./game";
 
 describe("daily garden details", () => {
@@ -38,5 +38,12 @@ describe("daily garden details", () => {
     expect(getPersianGreeting(new Date(2026, 7, 15, 13, 0))).toBe("ظهرت بخیر");
     expect(getPersianGreeting(new Date(2026, 7, 15, 18, 0))).toBe("عصرت بخیر");
     expect(getPersianGreeting(new Date(2026, 7, 15, 22, 0))).toBe("شبت بخیر");
+  });
+
+  it("moves the sky through dawn, day, sunset and night", () => {
+    expect(getSkyPhase(new Date(2026, 7, 15, 7, 0))).toBe("dawn");
+    expect(getSkyPhase(new Date(2026, 7, 15, 12, 0))).toBe("day");
+    expect(getSkyPhase(new Date(2026, 7, 15, 18, 0))).toBe("sunset");
+    expect(getSkyPhase(new Date(2026, 7, 15, 23, 0))).toBe("night");
   });
 });

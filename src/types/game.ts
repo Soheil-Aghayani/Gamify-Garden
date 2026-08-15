@@ -1,6 +1,7 @@
 export type QuestId = string;
 
 export type EnergyLevel = 1 | 2 | 3;
+export type MoodLevel = "tired" | "calm" | "low" | "energized";
 export type PlantStage = "seed" | "sprout" | "flower" | "tree";
 export type PaletteId = "mint" | "lilac" | "peach";
 export type ThemeMode = "light" | "dark" | "system";
@@ -33,6 +34,7 @@ export type Quest = TaskDefinition;
 export interface DailyState {
   dayKey: string;
   energy: EnergyLevel;
+  mood?: MoodLevel;
   energyConfirmed: boolean;
   completedQuestIds: QuestId[];
   dailyWin: boolean;
@@ -52,6 +54,7 @@ export interface GameState {
   tasks: TaskDefinition[];
   days: Record<string, DailyState>;
   totalWins: number;
+  lifetimeWins: number;
   gentleStreak: number;
   plantStage: PlantStage;
   hasSeenIntro: boolean;

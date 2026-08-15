@@ -6,11 +6,13 @@ import {
   getDailyPlantStage,
   getDailyTarget,
   getFlowStep,
+  getMoodForDay,
   getLongTermPlantStage,
   markIntroSeen,
   openLoveCapsule,
   removeTask,
   restoreTask,
+  setTodayMood,
   setTodayEnergy,
   setTodayReward,
   toggleQuest,
@@ -152,6 +154,30 @@ describe("Gamify Garden game rules", () => {
 
     expect(state.rewards).toContain("چای و موسیقی");
     expect(state.rewards.filter((reward) => reward === "چای و موسیقی")).toHaveLength(1);
+  });
+
+  it("adapts task energy to the selected mood", () => {
+    let state = freshState();
+    state = setTodayMood(state, "low", DAY);
+
+    expect(getMoodForDay(state.days[DAY])).toBe("low");
+    expect(state.days[DAY].energy).toBe(1);
+    expect(state.days[DAY].energyConfirmed).toBe(true);
+  });
+
+  it("keeps lifetime decor progress after a day is undone", () => {
+    let state = freshState();
+    QUESTS.slice(0, 3).forEach((questId) => {
+      state = toggleQuest(state, questId, DAY).state;
+    });
+    expect(state.totalWins).toBe(1);
+    expect(state.lifetimeWins).toBe(1);
+    expect(state.plantStage).toBe("sprout");
+
+    state = toggleQuest(state, QUESTS[0], DAY).state;
+    expect(state.totalWins).toBe(0);
+    expect(state.lifetimeWins).toBe(1);
+    expect(state.plantStage).toBe("sprout");
   });
 
   it("remembers opened love capsules without duplicates", () => {

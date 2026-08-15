@@ -84,6 +84,8 @@ input:focus-visible {
   --plant-trunk: #a87562;
   --shadow: 0 24px 70px rgba(105, 77, 111, 0.12);
   --toast-background: #433c52;
+  --mood-wash: rgba(255, 239, 213, 0.2);
+  --mood-sky-tint: rgba(255, 255, 255, 0.05);
   position: relative;
   isolation: isolate;
   min-height: 100dvh;
@@ -92,6 +94,7 @@ input:focus-visible {
   user-select: none;
   color: var(--ink);
   background:
+    radial-gradient(circle at 52% 0%, var(--mood-wash), transparent 28rem),
     radial-gradient(circle at 8% 10%, color-mix(in srgb, var(--peach) 45%, transparent), transparent 25rem),
     radial-gradient(circle at 92% 4%, color-mix(in srgb, var(--lavender) 55%, transparent), transparent 23rem),
     var(--background);
@@ -174,6 +177,46 @@ input:focus-visible {
   --plant-leaf: #9ac9a5;
 }
 
+.app-shell[data-mood="tired"] {
+  --mood-wash: rgba(222, 211, 247, 0.42);
+  --mood-sky-tint: rgba(218, 205, 245, 0.22);
+}
+
+.app-shell[data-mood="calm"] {
+  --mood-wash: rgba(206, 241, 224, 0.4);
+  --mood-sky-tint: rgba(201, 239, 222, 0.18);
+}
+
+.app-shell[data-mood="low"] {
+  --mood-wash: rgba(240, 216, 220, 0.44);
+  --mood-sky-tint: rgba(241, 210, 218, 0.2);
+}
+
+.app-shell[data-mood="energized"] {
+  --mood-wash: rgba(255, 226, 171, 0.5);
+  --mood-sky-tint: rgba(255, 220, 149, 0.2);
+}
+
+.app-shell[data-theme="dark"][data-mood="tired"] {
+  --mood-wash: rgba(108, 83, 145, 0.3);
+  --mood-sky-tint: rgba(126, 102, 164, 0.18);
+}
+
+.app-shell[data-theme="dark"][data-mood="calm"] {
+  --mood-wash: rgba(54, 112, 91, 0.28);
+  --mood-sky-tint: rgba(76, 142, 112, 0.15);
+}
+
+.app-shell[data-theme="dark"][data-mood="low"] {
+  --mood-wash: rgba(126, 70, 86, 0.28);
+  --mood-sky-tint: rgba(153, 85, 103, 0.16);
+}
+
+.app-shell[data-theme="dark"][data-mood="energized"] {
+  --mood-wash: rgba(132, 100, 40, 0.3);
+  --mood-sky-tint: rgba(171, 127, 48, 0.16);
+}
+
 .background-orb {
   position: absolute;
   z-index: -1;
@@ -197,7 +240,190 @@ input:focus-visible {
   background: color-mix(in srgb, var(--peach) 70%, transparent);
 }
 
+.sky-backdrop {
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: 18rem;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.9;
+  transition: background 800ms ease, opacity 800ms ease;
+  background: linear-gradient(180deg, #f8ded7 0%, #fff1d4 54%, transparent 100%);
+}
+
+.sky-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--mood-sky-tint);
+  mix-blend-mode: multiply;
+  transition: background 800ms ease;
+}
+
+.sky-backdrop--day {
+  background: linear-gradient(180deg, #cdeee9 0%, #eef7e5 50%, transparent 100%);
+}
+
+.sky-backdrop--sunset {
+  background: linear-gradient(180deg, #f3c0a6 0%, #f5d5c9 50%, transparent 100%);
+}
+
+.sky-backdrop--night {
+  background: linear-gradient(180deg, #28243e 0%, #49445f 54%, transparent 100%);
+  opacity: 0.82;
+}
+
+.app-shell[data-theme="dark"] .sky-backdrop--dawn {
+  background: linear-gradient(180deg, #4e394c 0%, #543e45 50%, transparent 100%);
+}
+
+.app-shell[data-theme="dark"] .sky-backdrop--day {
+  background: linear-gradient(180deg, #244b4e 0%, #314e4e 50%, transparent 100%);
+}
+
+.app-shell[data-theme="dark"] .sky-backdrop--sunset {
+  background: linear-gradient(180deg, #663d43 0%, #493b50 50%, transparent 100%);
+}
+
+.app-shell[data-theme="dark"] .sky-backdrop--night {
+  background: linear-gradient(180deg, #161428 0%, #28233d 54%, transparent 100%);
+}
+
+.sky-backdrop__sun,
+.sky-backdrop__moon {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  transition: opacity 800ms ease, transform 900ms cubic-bezier(0.2, 0.8, 0.25, 1), background 800ms ease;
+}
+
+.sky-backdrop__sun {
+  width: 5.5rem;
+  height: 5.5rem;
+  inset: 3.2rem 15% auto auto;
+  background: #ffe4a9;
+  box-shadow: 0 0 2.5rem rgba(255, 208, 119, 0.46);
+}
+
+.sky-backdrop--dawn .sky-backdrop__sun {
+  inset: 9rem 22% auto auto;
+  opacity: 0.8;
+  transform: scale(0.82);
+}
+
+.sky-backdrop--day .sky-backdrop__sun {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.sky-backdrop--sunset .sky-backdrop__sun {
+  inset: 6rem 12% auto auto;
+  background: #ffc39c;
+  box-shadow: 0 0 3rem rgba(255, 165, 106, 0.5);
+  transform: scale(0.9);
+}
+
+.sky-backdrop--night .sky-backdrop__sun,
+.sky-backdrop--night .sky-backdrop__cloud {
+  opacity: 0;
+  transform: translateY(-1rem);
+}
+
+.sky-backdrop__moon {
+  width: 4.2rem;
+  height: 4.2rem;
+  inset: 3rem 17% auto auto;
+  opacity: 0;
+  background: #fff3bf;
+  box-shadow: 0 0 2rem rgba(255, 242, 182, 0.28);
+  transform: translateY(1rem) scale(0.75);
+}
+
+.sky-backdrop__moon span {
+  position: absolute;
+  width: 4.2rem;
+  height: 4.2rem;
+  inset: -0.35rem auto auto 0.75rem;
+  display: block;
+  background: var(--background);
+  border-radius: 50%;
+}
+
+.sky-backdrop--night .sky-backdrop__moon {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.sky-backdrop__stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+
+.sky-backdrop--night .sky-backdrop__stars {
+  opacity: 1;
+}
+
+.sky-backdrop__star {
+  position: absolute;
+  color: #fff0ba;
+  font-size: 0.75rem;
+  animation: star-twinkle 2.6s ease-in-out infinite;
+}
+
+.sky-backdrop__horizon {
+  position: absolute;
+  width: 22rem;
+  height: 5rem;
+  inset: auto 8% -3.5rem auto;
+  background: color-mix(in srgb, var(--mood-wash) 75%, transparent);
+  border-radius: 50%;
+  filter: blur(1px);
+}
+
+.sky-backdrop__cloud {
+  position: absolute;
+  width: 6rem;
+  height: 1.2rem;
+  inset: 6.5rem auto auto 14%;
+  background: rgba(255, 255, 255, 0.48);
+  border-radius: 999px;
+  opacity: 0.76;
+  transition: opacity 700ms ease, transform 700ms ease;
+}
+
+.sky-backdrop__cloud::before,
+.sky-backdrop__cloud::after {
+  content: "";
+  position: absolute;
+  bottom: 0.2rem;
+  background: inherit;
+  border-radius: 50%;
+}
+
+.sky-backdrop__cloud::before {
+  width: 2rem;
+  height: 2rem;
+  inset-inline-start: 1rem;
+}
+
+.sky-backdrop__cloud::after {
+  width: 1.45rem;
+  height: 1.45rem;
+  inset-inline-start: 2.8rem;
+}
+
+.sky-backdrop__cloud--two {
+  inset: 9rem 12% auto auto;
+  transform: scale(0.7);
+  opacity: 0.42;
+}
+
 .page-shell {
+  position: relative;
+  z-index: 1;
   width: min(100% - 2rem, 980px);
   margin: 0 auto;
   padding: 2.25rem 0 1.5rem;
@@ -558,7 +784,7 @@ input:focus-visible {
 
 .energy-options {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.65rem;
 }
 
@@ -878,6 +1104,190 @@ input:focus-visible {
 .growth-spark--two {
   inset: auto 43% 1.4rem auto;
   color: #d69ab7;
+}
+
+.decor-card {
+  position: relative;
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.1rem 1.25rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 96% 4%, color-mix(in srgb, var(--primary-soft) 78%, transparent), transparent 12rem),
+    color-mix(in srgb, var(--surface) 92%, var(--mood-wash));
+}
+
+.decor-card__heading,
+.decor-card__title {
+  display: flex;
+  align-items: center;
+}
+
+.decor-card__heading {
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.decor-card__title {
+  min-width: 0;
+  gap: 0.65rem;
+}
+
+.decor-card__title h2 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 0.96rem;
+  letter-spacing: -0.025em;
+}
+
+.decor-card__icon {
+  display: grid;
+  place-items: center;
+  width: 2.45rem;
+  height: 2.45rem;
+  flex: 0 0 auto;
+  color: var(--primary-deep);
+  background: var(--primary-soft);
+  border-radius: 0.85rem 0.85rem 0.85rem 0.35rem;
+  transform: rotate(-5deg);
+}
+
+.decor-card__scene {
+  position: relative;
+  min-height: 5.1rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 75% 12%, color-mix(in srgb, var(--sun) 42%, transparent), transparent 4rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--lavender) 42%, var(--surface-solid)), color-mix(in srgb, var(--primary-soft) 58%, var(--surface-solid)));
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
+  border-radius: 1.25rem;
+}
+
+.decor-card__scene::before {
+  content: "";
+  position: absolute;
+  width: 120%;
+  height: 3rem;
+  inset: auto -10% -2rem auto;
+  background: color-mix(in srgb, var(--plant-leaf-light) 48%, transparent);
+  border-radius: 50%;
+  transform: rotate(-3deg);
+}
+
+.decor-card__scene::after {
+  content: "";
+  position: absolute;
+  width: 9rem;
+  height: 1.6rem;
+  inset: auto 35% 0.55rem auto;
+  background: color-mix(in srgb, var(--plant-trunk) 22%, transparent);
+  border-radius: 50%;
+}
+
+.decor-card__seed,
+.decor-card__scene-item,
+.decor-card__scene-hint {
+  position: absolute;
+  z-index: 1;
+}
+
+.decor-card__seed {
+  inset: auto 49% 0.95rem auto;
+  font-size: 1.55rem;
+  filter: drop-shadow(0 0.25rem 0.2rem rgba(67, 52, 79, 0.12));
+}
+
+.decor-card__scene-item {
+  font-size: 1.45rem;
+  line-height: 1;
+  filter: drop-shadow(0 0.22rem 0.18rem rgba(67, 52, 79, 0.14));
+  animation: decor-arrive 500ms cubic-bezier(0.2, 0.8, 0.25, 1.2) both;
+}
+
+.decor-card__scene-item--flower {
+  inset: auto 18% 0.75rem auto;
+}
+
+.decor-card__scene-item--butterfly {
+  inset: 0.8rem 29% auto auto;
+  font-size: 1.2rem;
+  animation-delay: 80ms;
+}
+
+.decor-card__scene-item--bench {
+  inset: auto 62% 0.8rem auto;
+  font-size: 1.7rem;
+  animation-delay: 140ms;
+}
+
+.decor-card__scene-item--lamp {
+  inset: 0.8rem 48% auto auto;
+  font-size: 1.25rem;
+  animation-delay: 200ms;
+}
+
+.decor-card__scene-item--cat {
+  inset: auto 8% 0.75rem auto;
+  font-size: 1.55rem;
+  animation-delay: 260ms;
+}
+
+.decor-card__scene-hint {
+  inset: 50% auto auto 50%;
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  color: var(--muted);
+  font-size: 0.68rem;
+  transform: translate(-50%, -50%);
+}
+
+.decor-card__collection {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.decor-card__item {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 0.42rem 0.2rem;
+  color: color-mix(in srgb, var(--muted) 66%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--muted) 20%, transparent);
+  border-radius: 0.8rem;
+  font-size: 0.56rem;
+  text-align: center;
+}
+
+.decor-card__item.is-unlocked {
+  color: var(--primary-deep);
+  background: color-mix(in srgb, var(--primary-soft) 48%, transparent);
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.decor-card__item-icon {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  color: inherit;
+  font-size: 1.05rem;
+}
+
+.decor-card__item > span:last-child {
+  overflow: hidden;
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.decor-card__hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.66rem;
+  text-align: center;
 }
 
 .quests-section {
@@ -2032,6 +2442,16 @@ input:focus-visible {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.38; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes decor-arrive {
+  from { opacity: 0; transform: translateY(0.45rem) scale(0.75) rotate(-8deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -2135,6 +2555,7 @@ input:focus-visible {
   }
 
   .energy-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.4rem;
   }
 
@@ -2226,6 +2647,28 @@ input:focus-visible {
 
   .reward-card {
     align-items: flex-start;
+  }
+
+  .decor-card {
+    padding: 1rem;
+    border-radius: 1.35rem;
+  }
+
+  .decor-card__title h2 {
+    font-size: 0.86rem;
+  }
+
+  .decor-card__scene {
+    min-height: 4.6rem;
+  }
+
+  .decor-card__collection {
+    gap: 0.25rem;
+  }
+
+  .decor-card__item {
+    padding-inline: 0.1rem;
+    font-size: 0.5rem;
   }
 
   .reward-options {

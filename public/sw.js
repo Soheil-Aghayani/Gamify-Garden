@@ -1,4 +1,4 @@
-const CACHE_NAME = "apricity-shell-v5";
+const CACHE_NAME = "apricity-shell-v6";
 const APP_SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./icon-192.svg", "./icon-512.svg"];
 
 self.addEventListener("install", (event) => {

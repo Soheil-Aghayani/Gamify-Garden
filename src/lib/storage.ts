@@ -1,7 +1,7 @@
 import { DEFAULT_TASKS } from "../data/quests";
 import { DEFAULT_REWARDS, REWARD_CATALOG_VERSION } from "../data/rewards";
 import { createInitialState, recalculateStats } from "./game";
-import type { DailyState, GameState, PaletteId, QuestId, TaskDefinition, TaskIconKey, ThemeMode } from "../types/game";
+import type { DailyState, GameState, MoodLevel, PaletteId, QuestId, TaskDefinition, TaskIconKey, ThemeMode } from "../types/game";
 
 export const STORAGE_KEY = "gamify-garden:v1";
 
@@ -29,6 +29,10 @@ function isPalette(value: unknown): value is PaletteId {
 
 function isThemeMode(value: unknown): value is ThemeMode {
   return value === "light" || value === "dark" || value === "system";
+}
+
+function isMoodLevel(value: unknown): value is MoodLevel {
+  return value === "tired" || value === "calm" || value === "low" || value === "energized";
 }
 
 function isTaskIconKey(value: unknown): value is TaskIconKey {
@@ -80,6 +84,9 @@ function normalizeDay(dayKey: string, value: unknown, tasks: TaskDefinition[]): 
   return {
     dayKey,
     energy,
+    mood: isMoodLevel(candidate.mood)
+      ? candidate.mood
+      : energy === 3 ? "energized" : "calm",
     energyConfirmed: typeof candidate.energyConfirmed === "boolean" ? candidate.energyConfirmed : true,
     completedQuestIds,
     dailyWin,
@@ -134,6 +141,11 @@ function normalizeState(value: unknown): GameState {
       .filter((id, index, list) => list.indexOf(id) === index)
       .slice(0, 100)
     : [];
+  const savedLifetimeWins = typeof candidate.lifetimeWins === "number" && Number.isFinite(candidate.lifetimeWins)
+    ? Math.max(0, Math.floor(candidate.lifetimeWins))
+    : typeof candidate.totalWins === "number" && Number.isFinite(candidate.totalWins)
+      ? Math.max(0, Math.floor(candidate.totalWins))
+      : 0;
 
   return recalculateStats({
     ...initial,
@@ -149,6 +161,7 @@ function normalizeState(value: unknown): GameState {
     },
     tasks: safeTasks,
     days,
+    lifetimeWins: savedLifetimeWins,
     hasSeenIntro: typeof candidate.hasSeenIntro === "boolean" ? candidate.hasSeenIntro : true,
     rewards: rewards.length > 0 ? rewards : [...DEFAULT_REWARDS],
     rewardCatalogVersion: REWARD_CATALOG_VERSION,

@@ -1,24 +1,25 @@
-import { CloudSun, Moon, Zap } from "lucide-react";
+import { BatteryLow, CloudSun, Cloudy, Zap, type LucideIcon } from "lucide-react";
 import type { Ref } from "react";
-import type { EnergyLevel } from "../types/game";
+import type { MoodLevel } from "../types/game";
 
 interface EnergyPickerProps {
-  value: EnergyLevel;
+  value: MoodLevel;
   confirmed: boolean;
   isNext: boolean;
   sectionRef?: Ref<HTMLElement>;
-  onChange: (value: EnergyLevel) => void;
+  onChange: (value: MoodLevel) => void;
 }
 
-const ENERGY_OPTIONS: Array<{
-  value: EnergyLevel;
+const MOOD_OPTIONS: Array<{
+  value: MoodLevel;
   label: string;
   copy: string;
-  Icon: typeof Moon;
+  Icon: LucideIcon;
 }> = [
-  { value: 1, label: "آرام", copy: "نسخه خیلی کوچیک", Icon: Moon },
-  { value: 2, label: "معمولی", copy: "نسخه استاندارد", Icon: CloudSun },
-  { value: 3, label: "پرانرژی", copy: "اگر دلت خواست بیشتر", Icon: Zap },
+  { value: "tired", label: "خسته‌ام", copy: "امروز آهسته‌تر می‌ریم", Icon: BatteryLow },
+  { value: "calm", label: "آرومم", copy: "یک قدم نرم و خوب", Icon: CloudSun },
+  { value: "low", label: "بی‌حوصله‌ام", copy: "فقط یک شروع کوچیک", Icon: Cloudy },
+  { value: "energized", label: "پرانرژی‌ام", copy: "اگر دلت خواست بیشتر", Icon: Zap },
 ];
 
 export function EnergyPicker({ value, confirmed, isNext, sectionRef, onChange }: EnergyPickerProps) {
@@ -32,14 +33,14 @@ export function EnergyPicker({ value, confirmed, isNext, sectionRef, onChange }:
       <div className="section-heading section-heading--compact">
         <div>
           <p className="eyebrow">اول از همه</p>
-          <h2 id="energy-title">امروز چقدر انرژی داری؟</h2>
+          <h2 id="energy-title">امروز چه حالی داری؟</h2>
         </div>
         <span className={`tiny-badge${isNext ? " tiny-badge--flow" : ""}`}>
           {isNext ? "قدم بعدی" : confirmed ? "انتخاب شد" : "هیچ جوابی غلط نیست"}
         </span>
       </div>
-      <div className="energy-options" role="group" aria-label="انتخاب انرژی امروز">
-        {ENERGY_OPTIONS.map(({ value: optionValue, label, copy, Icon }) => {
+      <div className="energy-options" role="group" aria-label="انتخاب حال امروز">
+        {MOOD_OPTIONS.map(({ value: optionValue, label, copy, Icon }) => {
           const selected = optionValue === value;
           return (
             <button
