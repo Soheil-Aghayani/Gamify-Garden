@@ -56,10 +56,10 @@ input:focus-visible {
   --surface-strong: #fffdfb;
   --ink: #5d536e;
   --ink-strong: #433c52;
-  --muted: #9b90a4;
+  --muted: #6b6177;
   --line: rgba(114, 93, 130, 0.13);
   --primary: #6db797;
-  --primary-deep: #3e8b6b;
+  --primary-deep: #2d7658;
   --primary-soft: #e1f4ea;
   --lavender: #e8e0ff;
   --peach: #ffd9c9;
@@ -91,7 +91,7 @@ input:focus-visible {
 
 .app-shell[data-palette="lilac"] {
   --primary: #9272c5;
-  --primary-deep: #6d4ca4;
+  --primary-deep: #64439b;
   --primary-soft: #eee8ff;
   --lavender: #dcd0ff;
   --peach: #f7d4df;
@@ -100,7 +100,7 @@ input:focus-visible {
 
 .app-shell[data-palette="peach"] {
   --primary: #d8896e;
-  --primary-deep: #ae604a;
+  --primary-deep: #97503d;
   --primary-soft: #ffede6;
   --lavender: #e7dbf6;
   --peach: #ffc5af;
@@ -453,7 +453,7 @@ input:focus-visible {
 }
 
 .tiny-badge--warm {
-  color: #9c6f46;
+  color: #79543d;
   background: color-mix(in srgb, var(--peach) 56%, transparent);
 }
 
