@@ -6,11 +6,17 @@ import {
   getDailyPlantStage,
   getDailyTarget,
   getFlowStep,
+  getPendingTreeSeeds,
+  getUnlockedGardenSlotCount,
   getMoodForDay,
   getLongTermPlantStage,
   markIntroSeen,
+  moveGardenItem,
   openLoveCapsule,
   removeTask,
+  removeGardenItem,
+  plantGardenItem,
+  restoreGardenItem,
   restoreTask,
   setTodayMood,
   setTodayEnergy,
@@ -110,7 +116,7 @@ describe("Gamify Garden game rules", () => {
     expect(getDailyTarget(state)).toBe(3);
   });
 
-  it("moves through the gentle daily flow", () => {
+  it("moves through the gentle daily flow and pauses for planting", () => {
     let state = freshState();
 
     expect(getFlowStep(state, DAY)).toBe("intro");
@@ -123,6 +129,9 @@ describe("Gamify Garden game rules", () => {
       state = toggleQuest(state, questId, DAY).state;
     });
 
+    expect(getFlowStep(state, DAY)).toBe("plant");
+    state = plantGardenItem(state, "tree", "plot-1", DAY).state;
+    expect(state.plantedItems).toHaveLength(1);
     expect(getFlowStep(state, DAY)).toBe("reward");
     state = setTodayReward(state, "یک نوشیدنی خوشمزه", DAY);
     expect(getFlowStep(state, DAY)).toBe("done");
@@ -173,13 +182,79 @@ describe("Gamify Garden game rules", () => {
     expect(state.totalWins).toBe(1);
     expect(state.lifetimeWins).toBe(1);
     expect(state.plantStage).toBe("sprout");
-    expect(state.gardenPlantStage).toBe("tree");
+    expect(state.gardenPlantStage).toBe("sprout");
+    expect(getPendingTreeSeeds(state)).toEqual([DAY]);
 
     state = toggleQuest(state, QUESTS[0], DAY).state;
     expect(state.totalWins).toBe(0);
     expect(state.lifetimeWins).toBe(1);
     expect(state.plantStage).toBe("sprout");
-    expect(state.gardenPlantStage).toBe("tree");
+    expect(state.gardenPlantStage).toBe("sprout");
+    expect(getPendingTreeSeeds(state)).toEqual([]);
+  });
+
+  it("opens garden capacity gradually", () => {
+    expect(getUnlockedGardenSlotCount(0)).toBe(6);
+    expect(getUnlockedGardenSlotCount(2)).toBe(6);
+    expect(getUnlockedGardenSlotCount(3)).toBe(8);
+    expect(getUnlockedGardenSlotCount(6)).toBe(10);
+    expect(getUnlockedGardenSlotCount(10)).toBe(12);
+  });
+
+  it("turns a daily win into one plantable tree and never duplicates it", () => {
+    let state = freshState();
+    QUESTS.slice(0, 3).forEach((questId) => {
+      state = toggleQuest(state, questId, DAY).state;
+    });
+
+    expect(getPendingTreeSeeds(state)).toEqual([DAY]);
+    const planted = plantGardenItem(state, "tree", "plot-1", DAY);
+    expect(planted.blocked).toBe(false);
+    state = planted.state;
+    expect(state.days[DAY].treeSeedClaimed).toBe(true);
+    expect(getPendingTreeSeeds(state)).toEqual([]);
+
+    state = toggleQuest(state, QUESTS[0], DAY).state;
+    expect(state.days[DAY].dailyWin).toBe(false);
+    expect(state.plantedItems).toHaveLength(1);
+
+    state = toggleQuest(state, QUESTS[0], DAY).state;
+    expect(state.days[DAY].dailyWin).toBe(true);
+    expect(getPendingTreeSeeds(state)).toEqual([]);
+    expect(state.plantedItems).toHaveLength(1);
+  });
+
+  it("unlocks flower and bush seeds and protects garden slots", () => {
+    let state = freshState();
+    expect(plantGardenItem(state, "flower", "plot-1").blocked).toBe(true);
+    expect(plantGardenItem(state, "tree", "plot-7").blocked).toBe(true);
+
+    state = { ...state, lifetimeWins: 3 };
+    const flower = plantGardenItem(state, "flower", "plot-1");
+    expect(flower.blocked).toBe(false);
+    state = flower.state;
+    expect(plantGardenItem(state, "bush", "plot-2").blocked).toBe(false);
+    expect(plantGardenItem(state, "flower", "plot-1").blocked).toBe(true);
+  });
+
+  it("moves, removes, and restores a planted item without refunding its seed", () => {
+    let state = { ...freshState(), lifetimeWins: 1 };
+    const planted = plantGardenItem(state, "flower", "plot-1");
+    expect(planted.item).toBeDefined();
+    state = planted.state;
+    const item = planted.item!;
+
+    const moved = moveGardenItem(state, item.id, "plot-2");
+    expect(moved.blocked).toBe(false);
+    state = moved.state;
+    expect(state.plantedItems[0].slotId).toBe("plot-2");
+
+    const removed = removeGardenItem(state, item.id);
+    expect(removed.blocked).toBe(false);
+    state = removed.state;
+    expect(state.plantedItems).toHaveLength(0);
+    expect(restoreGardenItem(state, { ...item, slotId: "plot-2" }).blocked).toBe(false);
+    expect(plantGardenItem(state, "flower", "plot-2").blocked).toBe(false);
   });
 
   it("remembers opened love capsules without duplicates", () => {

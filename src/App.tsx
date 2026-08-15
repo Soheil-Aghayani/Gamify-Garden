@@ -9,18 +9,23 @@ import {
   getDayState,
   getFlowStep,
   getMoodForDay,
+  getPendingTreeSeeds,
   markIntroSeen,
+  moveGardenItem,
   openLoveCapsule,
+  plantGardenItem,
   removeTask,
   removeReward,
+  removeGardenItem,
   restoreTask,
+  restoreGardenItem,
   setProfile,
   setTodayMood,
   setTodayReward,
   toggleQuest,
 } from "./lib/game";
 import { loadGameState, saveGameState } from "./lib/storage";
-import type { FlowStep, GameState, MoodLevel, Profile, QuestId, TaskDefinition } from "./types/game";
+import type { FlowStep, GardenSeedKind, GameState, MoodLevel, Profile, QuestId, TaskDefinition } from "./types/game";
 import { EnergyPicker } from "./components/EnergyPicker";
 import { GardenHeader } from "./components/GardenHeader";
 import { GardenDecor } from "./components/GardenDecor";
@@ -64,9 +69,13 @@ export default function App() {
   const [todayKey, setTodayKey] = useState(() => getDayKey());
   const [currentTime, setCurrentTime] = useState(() => new Date());
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [deferredTreeDayKey, setDeferredTreeDayKey] = useState<string | null>(null);
   const toastTimer = useRef<number | undefined>(undefined);
+  const gameStateRef = useRef<GameState>(gameState);
+  gameStateRef.current = gameState;
   const energyRef = useRef<HTMLElement | null>(null);
   const questsRef = useRef<HTMLElement | null>(null);
+  const gardenRef = useRef<HTMLElement | null>(null);
   const rewardRef = useRef<HTMLElement | null>(null);
   const loveCapsuleRef = useRef<HTMLElement | null>(null);
   const previousFlowStep = useRef<FlowStep | null>(null);
@@ -74,6 +83,9 @@ export default function App() {
   const todayMood = getMoodForDay(today);
   const target = getDailyTarget(gameState);
   const flowStep = getFlowStep(gameState, todayKey);
+  const pendingTreeSeedDays = getPendingTreeSeeds(gameState);
+  const deferredTreePlanting = deferredTreeDayKey === todayKey;
+  const focusFlowStep: FlowStep = deferredTreePlanting && flowStep === "plant" ? "reward" : flowStep;
   const todaySummary = getPersianDateSummary(currentTime);
   const greeting = getPersianGreeting(currentTime);
   const skyPhase = getSkyPhase(currentTime);
@@ -140,14 +152,15 @@ export default function App() {
 
   useEffect(() => {
     const previousStep = previousFlowStep.current;
-    if (previousStep !== null && previousStep !== flowStep) {
-      if (flowStep === "energy") focusSection(energyRef);
-      if (flowStep === "tasks") focusSection(questsRef);
-      if (flowStep === "reward") focusSection(rewardRef);
-      if (flowStep === "done") focusSection(loveCapsuleRef);
+    if (previousStep !== null && previousStep !== focusFlowStep) {
+      if (focusFlowStep === "energy") focusSection(energyRef);
+      if (focusFlowStep === "tasks") focusSection(questsRef);
+      if (focusFlowStep === "plant") focusSection(gardenRef);
+      if (focusFlowStep === "reward") focusSection(rewardRef);
+      if (focusFlowStep === "done") focusSection(loveCapsuleRef);
     }
-    previousFlowStep.current = flowStep;
-  }, [flowStep]);
+    previousFlowStep.current = focusFlowStep;
+  }, [focusFlowStep]);
 
   const showToast = (message: string, action?: ToastAction) => {
     setToast({ message, action });
@@ -178,12 +191,58 @@ export default function App() {
 
     const nextToday = getDayState(result.state, todayKey);
     if (nextToday.dailyWin && !today.dailyWin) {
-      showToast("باغ امروز شکوفه زد؛ آفرین بهت ✨");
+      showToast("درخت امروز آماده‌ست؛ یک جای خوب براش پیدا کن 🌳");
     } else if (nextToday.completedQuestIds.length > today.completedQuestIds.length) {
       const remaining = target - nextToday.completedQuestIds.length;
       showToast(remaining > 0 ? `${toPersianDigits(remaining)} قدم کوچیک دیگه تا شکوفه 🌱` : "قدم قشنگی بود 🌱");
     }
     setGameState(result.state);
+  };
+
+  const handlePlant = (kind: GardenSeedKind, slotId: string, sourceDayKey?: string) => {
+    const result = plantGardenItem(gameState, kind, slotId, sourceDayKey);
+    if (result.blocked) {
+      showToast("این جایگاه برای کاشت آماده نیست؛ یکی از جای خالی‌ها را انتخاب کن 🌱");
+      return;
+    }
+    setGameState(result.state);
+    if (kind === "tree") setDeferredTreeDayKey(null);
+    showToast(kind === "tree" ? "درختت توی باغ ریشه گرفت 🌳" : kind === "flower" ? "گل کوچولوت شکوفا شد 🌼" : "بوته‌ات گوشه‌ی باغ جا گرفت 🌿");
+  };
+
+  const handleDeferTree = () => {
+    setDeferredTreeDayKey(todayKey);
+    showToast("درختت همین‌جا منتظرت می‌مونه؛ هر وقت خواستی بکارش 🌱");
+  };
+
+  const handleMoveGardenItem = (itemId: string, slotId: string) => {
+    const result = moveGardenItem(gameState, itemId, slotId);
+    if (result.blocked) {
+      showToast("این جایگاه پر یا قفل است؛ یک جای خالی دیگر را امتحان کن 🌱");
+      return;
+    }
+    setGameState(result.state);
+    showToast("جای کوچولویش عوض شد ✨");
+  };
+
+  const handleRemoveGardenItem = (itemId: string) => {
+    const result = removeGardenItem(gameState, itemId);
+    const removedItem = result.item;
+    if (result.blocked || !removedItem) return;
+    setGameState(result.state);
+    showToast("از باغ بیرون رفت؛ اگر خواستی برش گردان", {
+      label: "برگردان",
+      onClick: () => {
+        const restored = restoreGardenItem(gameStateRef.current, removedItem);
+        if (restored.blocked) {
+          showToast("جای قبلی‌اش دیگر خالی نیست؛ اول یک جایگاه باز کن 🌱");
+          return;
+        }
+        setGameState(restored.state);
+        if (toastTimer.current) window.clearTimeout(toastTimer.current);
+        setToast(null);
+      },
+    });
   };
 
   const handleReward = (reward: string) => {
@@ -286,7 +345,18 @@ export default function App() {
             avatarVariant={dailyAvatar.variant}
             palette={gameState.profile.palette}
           />
-          <GardenDecor lifetimeWins={gameState.lifetimeWins} gardenPlantStage={gameState.gardenPlantStage} />
+          <GardenDecor
+            lifetimeWins={gameState.lifetimeWins}
+            plantedItems={gameState.plantedItems}
+            pendingTreeSeedDays={pendingTreeSeedDays}
+            deferredTreePlanting={deferredTreePlanting}
+            isNext={focusFlowStep === "plant"}
+            sectionRef={gardenRef}
+            onPlant={handlePlant}
+            onDefer={handleDeferTree}
+            onMove={handleMoveGardenItem}
+            onRemove={handleRemoveGardenItem}
+          />
           <WeekMemory days={gameState.days} todayKey={todayKey} />
           <QuestGrid
             quests={gameState.tasks}
@@ -304,7 +374,7 @@ export default function App() {
             dayKey={todayKey}
             rewards={gameState.rewards}
             selectedReward={today.rewardChoice}
-            isNext={flowStep === "reward"}
+            isNext={focusFlowStep === "reward"}
             sectionRef={rewardRef}
             onChoose={handleReward}
           />

@@ -1294,6 +1294,12 @@ input:focus-visible {
   width: 100%;
 }
 
+.decor-card__scene-plant .garden-item-art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .decor-card__scene--seed .decor-card__scene-plant {
   width: 5rem;
   bottom: -1.05rem;
@@ -1413,6 +1419,363 @@ input:focus-visible {
   color: var(--muted);
   font-size: 0.66rem;
   text-align: center;
+}
+
+.decor-card.is-flow-next {
+  border-color: color-mix(in srgb, var(--primary) 36%, var(--line));
+  box-shadow: 0 0 0 0.3rem color-mix(in srgb, var(--primary) 8%, transparent), var(--shadow);
+}
+
+.garden-board {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.85rem;
+  background: color-mix(in srgb, var(--surface-solid) 78%, var(--primary-soft));
+  border: 1px solid color-mix(in srgb, var(--primary) 13%, transparent);
+  border-radius: 1.1rem;
+}
+
+.garden-board__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.garden-board__heading .eyebrow {
+  margin-bottom: 0.18rem;
+}
+
+.garden-board__heading strong {
+  display: block;
+  color: var(--ink-strong);
+  font-size: 0.78rem;
+  line-height: 1.7;
+}
+
+.garden-board__capacity {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 0.25rem;
+  padding: 0.35rem 0.55rem;
+  color: var(--primary-deep);
+  background: var(--primary-soft);
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.garden-board__instruction {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  padding: 0.5rem 0.65rem;
+  color: var(--primary-deep);
+  background: color-mix(in srgb, var(--primary-soft) 76%, var(--surface-solid));
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  border-radius: 0.8rem;
+  font-size: 0.65rem;
+  line-height: 1.65;
+}
+
+.garden-board__instruction > span:nth-child(2) {
+  flex: 1;
+}
+
+.garden-board__instruction--moving {
+  color: var(--warm-ink);
+  background: color-mix(in srgb, var(--peach) 38%, var(--surface-solid));
+  border-color: color-mix(in srgb, var(--peach) 38%, transparent);
+}
+
+.garden-board__slots {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.garden-plot {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  min-width: 0;
+  min-height: 5.05rem;
+  padding: 0.32rem 0.18rem;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--surface-solid) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--muted) 13%, transparent);
+  border-radius: 0.9rem;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms ease, opacity 180ms ease;
+}
+
+.garden-plot:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--primary) 42%, transparent);
+  transform: translateY(-0.1rem);
+}
+
+.garden-plot:focus-visible,
+.garden-seed-option:focus-visible {
+  outline: 0.18rem solid color-mix(in srgb, var(--primary) 36%, transparent);
+  outline-offset: 0.1rem;
+}
+
+.garden-plot--empty {
+  border-style: dashed;
+}
+
+.garden-plot--occupied {
+  color: var(--primary-deep);
+  background: color-mix(in srgb, var(--primary-soft) 54%, var(--surface-solid));
+  border-color: color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.garden-plot--locked {
+  color: color-mix(in srgb, var(--muted) 65%, transparent);
+  background: color-mix(in srgb, var(--muted) 5%, var(--surface-solid));
+  border-style: dashed;
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.garden-plot.is-target {
+  color: var(--primary-deep);
+  background: color-mix(in srgb, var(--primary-soft) 78%, var(--surface-solid));
+  border: 1px solid color-mix(in srgb, var(--primary) 52%, transparent);
+  box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--primary) 9%, transparent);
+  animation: garden-target-pulse 1.5s ease-in-out infinite;
+}
+
+.garden-plot.is-selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.garden-plot.is-moving {
+  border-color: var(--warm-ink);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--peach) 22%, transparent);
+}
+
+.garden-plot__art {
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.1rem;
+  overflow: visible;
+}
+
+.garden-plot__art .plant-art,
+.garden-plot__art .garden-item-art {
+  display: block;
+  width: 100%;
+  max-height: 100%;
+  overflow: visible;
+}
+
+.garden-plot__empty-icon,
+.garden-plot__lock {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0.42rem 0.45rem;
+  color: color-mix(in srgb, var(--primary) 50%, var(--muted));
+  background: color-mix(in srgb, var(--primary-soft) 52%, transparent);
+  border-radius: 50%;
+}
+
+.garden-plot__lock {
+  color: var(--muted);
+  background: color-mix(in srgb, var(--muted) 8%, transparent);
+}
+
+.garden-plot__label {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  color: inherit;
+  font-size: 0.55rem;
+  line-height: 1.45;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.garden-seed-tray {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.garden-seed-option {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.45rem;
+  padding: 0.48rem;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface-solid) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--muted) 13%, transparent);
+  border-radius: 0.82rem;
+  cursor: pointer;
+  text-align: start;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease, opacity 180ms ease;
+}
+
+.garden-seed-option:hover:not(:disabled) {
+  transform: translateY(-0.1rem);
+}
+
+.garden-seed-option.is-selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.garden-seed-option.is-locked,
+.garden-seed-option:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.garden-seed-option--mint.is-selected {
+  background: color-mix(in srgb, var(--primary-soft) 78%, var(--surface-solid));
+}
+
+.garden-seed-option--peach.is-selected {
+  background: color-mix(in srgb, var(--peach) 54%, var(--surface-solid));
+}
+
+.garden-seed-option--lilac.is-selected {
+  background: color-mix(in srgb, var(--lavender) 32%, var(--surface-solid));
+}
+
+.garden-seed-option__emoji {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.22rem;
+  background: var(--primary-soft);
+  border-radius: 0.65rem;
+}
+
+.garden-seed-option--peach .garden-seed-option__emoji {
+  background: color-mix(in srgb, var(--peach) 45%, var(--surface-solid));
+}
+
+.garden-seed-option--lilac .garden-seed-option__emoji {
+  background: color-mix(in srgb, var(--lavender) 48%, var(--surface-solid));
+}
+
+.garden-seed-option__copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.1rem;
+}
+
+.garden-seed-option__copy strong,
+.garden-seed-option__copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.garden-seed-option__copy strong {
+  color: inherit;
+  font-size: 0.62rem;
+}
+
+.garden-seed-option__copy small {
+  color: var(--muted);
+  font-size: 0.51rem;
+}
+
+.garden-board__plant-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.75rem;
+  padding-top: 0.1rem;
+}
+
+.garden-board__plant-cta .primary-button {
+  min-height: 2.5rem;
+  padding-inline: 0.9rem;
+  white-space: normal;
+}
+
+.garden-item-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.7rem;
+  padding: 0.55rem 0.65rem;
+  color: var(--primary-deep);
+  background: color-mix(in srgb, var(--primary-soft) 58%, var(--surface-solid));
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, transparent);
+  border-radius: 0.8rem;
+}
+
+.garden-item-actions__title {
+  flex: 1 1 100%;
+  color: var(--ink-strong);
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.text-button--danger {
+  color: var(--danger, #b65b78);
+}
+
+.garden-item-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.garden-item-art__ground {
+  fill: color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.garden-item-art__stem {
+  fill: none;
+  stroke: var(--plant-trunk);
+  stroke-linecap: round;
+  stroke-width: 7;
+}
+
+.garden-item-art__leaf {
+  fill: var(--plant-leaf);
+}
+
+.garden-item-art__petals circle {
+  fill: var(--plant-petal);
+}
+
+.garden-item-art__petals .garden-item-art__center {
+  fill: var(--sun);
+}
+
+.garden-item-art__bush {
+  fill: var(--plant-leaf);
+}
+
+.garden-item-art__bush--two {
+  fill: var(--plant-leaf);
+}
+
+.garden-item-art__bush--three {
+  fill: var(--plant-leaf-light);
+}
+
+.garden-item-art__berry {
+  fill: var(--sun);
 }
 
 .quests-section {
@@ -2607,6 +2970,11 @@ input:focus-visible {
   50% { box-shadow: 0 0 0 0.35rem color-mix(in srgb, var(--primary) 9%, transparent); }
 }
 
+@keyframes garden-target-pulse {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.12rem); }
+}
+
 @media (max-width: 720px) {
   .page-shell {
     width: min(100% - 1.25rem, 600px);
@@ -2813,6 +3181,52 @@ input:focus-visible {
 
   .decor-card__scene--tree .decor-card__scene-plant {
     width: 10rem;
+  }
+
+  .garden-board__heading {
+    align-items: flex-start;
+  }
+
+  .garden-board__heading strong {
+    font-size: 0.72rem;
+  }
+
+  .garden-board__slots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+
+  .garden-plot {
+    min-height: 4.45rem;
+  }
+
+  .garden-plot__art {
+    width: 2.9rem;
+    height: 2.75rem;
+  }
+
+  .garden-plot__label {
+    font-size: 0.52rem;
+  }
+
+  .garden-seed-option {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.28rem;
+    padding: 0.45rem;
+  }
+
+  .garden-seed-option__emoji {
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+
+  .garden-seed-option__copy strong {
+    font-size: 0.58rem;
+  }
+
+  .garden-seed-option__copy small {
+    font-size: 0.48rem;
   }
 
   .decor-card__collection {
