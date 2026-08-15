@@ -1490,6 +1490,712 @@ input:focus-visible {
   border-radius: 1.1rem;
 }
 
+/* The garden scene is intentionally a small original top-down pixel map:
+   tiled grass, tilled soil, a cottage, paths, props and clickable plots. */
+.pixel-garden-map {
+  --pixel-grass: #76b255;
+  --pixel-grass-dark: #4d914a;
+  --pixel-grass-light: #9acc68;
+  --pixel-soil: #bd7c35;
+  --pixel-soil-dark: #965a2d;
+  --pixel-soil-light: #d49a4c;
+  --pixel-path: #d8a448;
+  --pixel-wood: #9a572e;
+  --pixel-wood-light: #d18a42;
+  --pixel-roof: #96372b;
+  --pixel-water: #5fb9c5;
+  --pixel-ink: #513c36;
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--pixel-grass);
+  border: 0.15rem solid color-mix(in srgb, var(--pixel-grass-dark) 55%, var(--surface-solid));
+  border-radius: 1rem;
+  box-shadow: inset 0 0 0 0.2rem color-mix(in srgb, var(--pixel-grass-light) 20%, transparent), 0 0.65rem 1.4rem rgba(70, 56, 50, 0.12);
+  image-rendering: pixelated;
+}
+
+.pixel-garden-map__grass {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  background-color: var(--pixel-grass);
+  background-image:
+    linear-gradient(90deg, color-mix(in srgb, var(--pixel-grass-dark) 13%, transparent) 1px, transparent 1px),
+    linear-gradient(0deg, color-mix(in srgb, var(--pixel-grass-light) 13%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at 14% 17%, color-mix(in srgb, var(--pixel-grass-light) 72%, transparent) 0 0.14rem, transparent 0.15rem),
+    radial-gradient(circle at 87% 72%, color-mix(in srgb, var(--pixel-grass-dark) 58%, transparent) 0 0.12rem, transparent 0.13rem);
+  background-size: 1.2rem 1.2rem, 1.2rem 1.2rem, 4.1rem 3.7rem, 3.6rem 3.2rem;
+}
+
+.pixel-garden-map__grass::before,
+.pixel-garden-map__grass::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  width: 0.4rem;
+  height: 0.2rem;
+  background: var(--pixel-grass-dark);
+  box-shadow: 0.7rem -0.25rem var(--pixel-grass-light), 1.45rem 0.12rem var(--pixel-grass-dark), 2.2rem -0.36rem var(--pixel-grass-light);
+  opacity: 0.66;
+}
+
+.pixel-garden-map__grass::before {
+  inset: 37% auto auto 7%;
+  transform: rotate(-12deg);
+}
+
+.pixel-garden-map__grass::after {
+  inset: 74% 8% auto auto;
+  transform: rotate(13deg);
+}
+
+.pixel-garden-map__sun-patch {
+  position: absolute;
+  z-index: 1;
+  width: 7%;
+  aspect-ratio: 1;
+  inset: 5% auto auto 9%;
+  background: #f4d36e;
+  box-shadow: 0.35rem 0.35rem 0 #e9ba51, 0 0 0 0.28rem color-mix(in srgb, #f4d36e 22%, transparent);
+  opacity: 0.84;
+}
+
+.pixel-garden-map__path {
+  position: absolute;
+  z-index: 2;
+  background-color: var(--pixel-path);
+  background-image:
+    linear-gradient(90deg, color-mix(in srgb, #a66a32 30%, transparent) 1px, transparent 1px),
+    linear-gradient(0deg, color-mix(in srgb, #f1c064 28%, transparent) 1px, transparent 1px);
+  background-size: 1.15rem 1.15rem;
+  box-shadow: inset 0 0.22rem 0 color-mix(in srgb, #f2c16a 52%, transparent), inset 0 -0.2rem 0 color-mix(in srgb, #9d6631 28%, transparent);
+}
+
+.pixel-garden-map__path--main {
+  width: 116%;
+  height: 16%;
+  inset: 39% -8% auto auto;
+  transform: rotate(-7deg);
+}
+
+.pixel-garden-map__path--side {
+  width: 41%;
+  height: 13%;
+  inset: 22% -6% auto auto;
+  transform: rotate(18deg);
+}
+
+.pixel-house {
+  position: absolute;
+  z-index: 4;
+  width: 28%;
+  height: 29%;
+  inset: 3% auto auto 35%;
+}
+
+.pixel-house__roof {
+  position: absolute;
+  z-index: 3;
+  width: 100%;
+  height: 53%;
+  inset: 0 auto auto;
+  background-color: var(--pixel-roof);
+  background-image: repeating-linear-gradient(90deg, color-mix(in srgb, #f36e36 38%, transparent) 0 0.18rem, transparent 0.18rem 0.72rem);
+  border: 0.2rem solid #703028;
+  clip-path: polygon(8% 100%, 18% 0, 82% 0, 94% 100%);
+  box-shadow: 0.22rem 0.22rem 0 #672c27;
+}
+
+.pixel-house__wall {
+  position: absolute;
+  z-index: 2;
+  width: 82%;
+  height: 58%;
+  inset: 36% 9% auto auto;
+  background-color: #bd7436;
+  background-image: repeating-linear-gradient(90deg, color-mix(in srgb, #6d3b29 26%, transparent) 0 0.12rem, transparent 0.12rem 0.65rem), linear-gradient(0deg, #d89248 0 0.16rem, transparent 0.16rem 0.62rem);
+  border: 0.16rem solid #713a29;
+  box-shadow: inset 0 0.18rem 0 #e4a356;
+}
+
+.pixel-house__door {
+  position: absolute;
+  z-index: 5;
+  width: 17%;
+  height: 34%;
+  inset: auto 42% 4% auto;
+  background: #713a2a;
+  border: 0.12rem solid #492d29;
+  box-shadow: inset 0.14rem 0.14rem 0 #b86635;
+}
+
+.pixel-house__door::after {
+  content: "";
+  position: absolute;
+  width: 0.22rem;
+  height: 0.22rem;
+  inset: 52% 16% auto auto;
+  background: #f4ca63;
+}
+
+.pixel-house__window {
+  position: absolute;
+  z-index: 5;
+  width: 14%;
+  height: 18%;
+  background: #75c7cc;
+  border: 0.13rem solid #f5d58b;
+  box-shadow: inset 0.18rem 0 #4f8d99, inset -0.18rem -0.18rem 0 #4f8d99;
+}
+
+.pixel-house__window--one { inset: 49% auto auto 18%; }
+.pixel-house__window--two { inset: 49% 18% auto auto; }
+
+.pixel-house__steps {
+  position: absolute;
+  z-index: 4;
+  width: 27%;
+  height: 9%;
+  inset: auto 36% -8% auto;
+  background: #d28b42;
+  border: 0.12rem solid #78412c;
+  box-shadow: 0.2rem 0.25rem 0 #78412c;
+}
+
+.pixel-well {
+  position: absolute;
+  z-index: 5;
+  width: 10%;
+  height: 16%;
+  inset: 43% 8% auto auto;
+}
+
+.pixel-well__stone {
+  position: absolute;
+  z-index: 2;
+  width: 74%;
+  height: 56%;
+  inset: 40% 13% auto auto;
+  background: repeating-linear-gradient(0deg, #6b6256 0 0.28rem, #988979 0.28rem 0.48rem);
+  border: 0.18rem solid #4d5149;
+  border-radius: 42% 42% 23% 23%;
+  box-shadow: 0.18rem 0.2rem 0 #4a473f;
+}
+
+.pixel-well__water {
+  position: absolute;
+  z-index: 4;
+  width: 42%;
+  height: 15%;
+  inset: 49% 29% auto auto;
+  background: var(--pixel-water);
+  border-radius: 50%;
+}
+
+.pixel-well__roof {
+  position: absolute;
+  z-index: 5;
+  width: 88%;
+  height: 16%;
+  inset: 19% 6% auto auto;
+  background: #7c412a;
+  box-shadow: 0.24rem 0.18rem 0 #4d352d;
+}
+
+.pixel-well__roof::before,
+.pixel-well__roof::after {
+  content: "";
+  position: absolute;
+  bottom: -1.2rem;
+  width: 0.15rem;
+  height: 1.25rem;
+  background: #5b392a;
+}
+
+.pixel-well__roof::before { inset-inline-start: 0.2rem; }
+.pixel-well__roof::after { inset-inline-end: 0.2rem; }
+
+.pixel-bench {
+  position: absolute;
+  z-index: 5;
+  width: 13%;
+  height: 5%;
+  inset: 31% 17% auto auto;
+  background: repeating-linear-gradient(0deg, #87452d 0 0.16rem, #c77c3b 0.16rem 0.34rem);
+  border: 0.13rem solid #653b2d;
+  box-shadow: 0.16rem 0.22rem 0 #5d3c2f;
+}
+
+.pixel-bench::before,
+.pixel-bench::after {
+  content: "";
+  position: absolute;
+  bottom: -0.45rem;
+  width: 0.16rem;
+  height: 0.5rem;
+  background: #5c3a2d;
+}
+
+.pixel-bench::before { inset-inline-start: 0.35rem; }
+.pixel-bench::after { inset-inline-end: 0.35rem; }
+
+.pixel-mailbox {
+  position: absolute;
+  z-index: 5;
+  width: 3%;
+  height: 7%;
+  inset: 34% auto auto 24%;
+  background: #68665b;
+  border: 0.12rem solid #464c46;
+  box-shadow: 0.2rem 0.8rem 0 -0.08rem #65412f;
+}
+
+.pixel-mailbox::before {
+  content: "";
+  position: absolute;
+  width: 0.55rem;
+  height: 0.16rem;
+  inset: 34% auto auto 0.2rem;
+  background: #e4c158;
+}
+
+.pixel-stump {
+  position: absolute;
+  z-index: 4;
+  width: 7%;
+  height: 8%;
+  inset: auto 16% 8% auto;
+  background: #855132;
+  border: 0.16rem solid #633e2d;
+  border-radius: 43% 43% 20% 20%;
+  box-shadow: 0.18rem 0.25rem 0 #5e3b2e;
+}
+
+.pixel-stump::after {
+  content: "✦";
+  position: absolute;
+  inset: 8% auto auto 28%;
+  color: #d9944b;
+  font-size: 0.55rem;
+}
+
+.pixel-tree {
+  position: absolute;
+  z-index: 4;
+  width: 15%;
+  height: 28%;
+}
+
+.pixel-tree::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  width: 43%;
+  height: 54%;
+  inset: 5% auto auto 28%;
+  background: #237447;
+  border-radius: 42% 18% 32% 16%;
+  box-shadow: -0.85rem 0.75rem 0 #3a9551, 0.82rem 0.82rem 0 #2e874b, 0.04rem 1.35rem 0 #56a85a, -0.68rem 1.48rem 0 #328c4d;
+}
+
+.pixel-tree::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  width: 18%;
+  height: 48%;
+  inset: auto 41% 0 auto;
+  background: #75462d;
+  box-shadow: 0.28rem 0.1rem 0 #9d6035;
+}
+
+.pixel-tree--left { inset: 4% auto auto 5%; }
+.pixel-tree--right { inset: 5% 2% auto auto; transform: scale(0.68); transform-origin: top right; }
+
+.pixel-bushes {
+  position: absolute;
+  z-index: 4;
+  width: 17%;
+  height: 10%;
+  background: #3c914c;
+  border: 0.15rem solid #267242;
+  box-shadow: 0.75rem -0.3rem 0 #64ad58, 1.5rem 0.12rem 0 #2d8248, 2.35rem -0.25rem 0 #55a955, 0.3rem 0.6rem 0 #2b7b45;
+}
+
+.pixel-bushes::after {
+  content: "✿  ·  ✿";
+  position: absolute;
+  inset: 12% auto auto 28%;
+  color: #f7c4d8;
+  font-size: 0.55rem;
+  letter-spacing: 0.1rem;
+}
+
+.pixel-bushes--left { inset: auto auto 10% 11%; }
+.pixel-bushes--right { inset: auto 3% 14% auto; transform: scale(0.9); }
+
+.pixel-fence {
+  position: absolute;
+  z-index: 7;
+  pointer-events: none;
+  background-color: #78452e;
+  box-shadow: inset 0 0.18rem 0 #c17a3c, inset 0 -0.2rem 0 #4f342c;
+}
+
+.pixel-fence--left {
+  width: 2.3%;
+  height: 61%;
+  inset: 27% auto auto 1.2%;
+  background-image: repeating-linear-gradient(0deg, #78452e 0 0.95rem, #bd753b 0.95rem 1.15rem, #78452e 1.15rem 1.75rem);
+}
+
+.pixel-fence--bottom {
+  width: 68%;
+  height: 3.1%;
+  inset: auto auto 1.7% 13%;
+  background-image: repeating-linear-gradient(90deg, #78452e 0 0.55rem, #c27d3d 0.55rem 0.76rem, #78452e 0.76rem 1.4rem);
+}
+
+.pixel-character {
+  position: absolute;
+  z-index: 8;
+  width: 4.4%;
+  height: 12%;
+  inset: 53% auto auto 67%;
+  filter: drop-shadow(0.15rem 0.2rem 0 rgba(70, 50, 40, 0.25));
+}
+
+.pixel-character__hat {
+  position: absolute;
+  z-index: 4;
+  width: 115%;
+  height: 22%;
+  inset: 0 -8% auto auto;
+  background: #b77939;
+  border: 0.1rem solid #67412f;
+  border-radius: 45% 45% 15% 15%;
+}
+
+.pixel-character__head {
+  position: absolute;
+  z-index: 3;
+  width: 63%;
+  height: 35%;
+  inset: 18% 19% auto auto;
+  background: #f0b27c;
+  border: 0.1rem solid #784a36;
+}
+
+.pixel-character__body {
+  position: absolute;
+  z-index: 2;
+  width: 78%;
+  height: 36%;
+  inset: 50% 10% auto auto;
+  background: #507e9c;
+  border: 0.1rem solid #3d5265;
+}
+
+.pixel-character__legs {
+  position: absolute;
+  z-index: 1;
+  width: 54%;
+  height: 20%;
+  inset: auto 22% 0 auto;
+  background: #6c4531;
+  box-shadow: -0.28rem 0.08rem 0 #48382f, 0.3rem 0.08rem 0 #48382f;
+}
+
+.pixel-soil-patch {
+  position: absolute;
+  z-index: 2;
+  background-color: var(--pixel-soil);
+  background-image:
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--pixel-soil-dark) 36%, transparent) 0 0.14rem, transparent 0.14rem 1.1rem),
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--pixel-soil-light) 26%, transparent) 0 0.12rem, transparent 0.12rem 0.82rem);
+  border: 0.16rem solid var(--pixel-soil-dark);
+  box-shadow: inset 0.2rem 0.2rem 0 color-mix(in srgb, var(--pixel-soil-light) 34%, transparent), 0.2rem 0.24rem 0 color-mix(in srgb, var(--pixel-soil-dark) 34%, transparent);
+}
+
+.pixel-soil-patch--main {
+  width: 48%;
+  height: 44%;
+  inset: 38% auto auto 26%;
+  clip-path: polygon(2% 7%, 98% 0, 100% 94%, 94% 100%, 1% 94%, 0 18%);
+}
+
+.pixel-soil-patch--left {
+  width: 16%;
+  height: 25%;
+  inset: 48% auto auto 8%;
+}
+
+.pixel-soil-patch--right {
+  width: 14%;
+  height: 27%;
+  inset: 50% 9% auto auto;
+}
+
+.pixel-crop-row {
+  position: absolute;
+  z-index: 3;
+  width: 15%;
+  height: 4%;
+  background: #267f49;
+  box-shadow: 1.2rem 0.1rem 0 #3f9951, 2.45rem -0.1rem 0 #267f49, 3.65rem 0.12rem 0 #56a656;
+}
+
+.pixel-crop-row::before,
+.pixel-crop-row::after {
+  content: "";
+  position: absolute;
+  width: 0.35rem;
+  height: 0.65rem;
+  background: #4da651;
+  box-shadow: 1.2rem 0.08rem 0 #2e8e4b, 2.45rem -0.1rem 0 #4da651, 3.65rem 0.12rem 0 #2e8e4b;
+}
+
+.pixel-crop-row::before { inset: -0.42rem auto auto 0.35rem; }
+.pixel-crop-row::after { inset: 0.25rem auto auto 0.65rem; }
+.pixel-crop-row--one { inset: 47% auto auto 11%; transform: rotate(90deg) scale(0.64); }
+.pixel-crop-row--two { inset: 68% auto auto 31%; transform: scale(0.72); }
+.pixel-crop-row--three { inset: 64% auto auto 74%; transform: scale(0.58); }
+
+.pixel-flower-cluster {
+  position: absolute;
+  z-index: 4;
+  width: 3%;
+  height: 4%;
+  background: #f3c4d7;
+  box-shadow: 0.65rem -0.18rem 0 #f8e092, 1.2rem 0.2rem 0 #f3c4d7, 1.75rem -0.12rem 0 #f8e092;
+}
+
+.pixel-flower-cluster--one { inset: 25% auto auto 73%; }
+.pixel-flower-cluster--two { inset: auto 22% 7% auto; transform: scale(0.72); }
+
+.pixel-garden-map__plot-field {
+  position: absolute;
+  z-index: 10;
+  width: 43%;
+  height: 39%;
+  inset: 41% auto auto 28%;
+}
+
+.pixel-garden-map__preview {
+  position: absolute;
+  z-index: 11;
+  display: grid;
+  justify-items: center;
+  gap: 0.08rem;
+  width: 10%;
+  min-width: 3.1rem;
+  padding: 0.18rem 0.24rem;
+  inset: 72% auto auto 77%;
+  color: #fff4bd;
+  background: color-mix(in srgb, #4d7d46 74%, transparent);
+  border: 0.1rem dashed #f4db84;
+  border-radius: 0.24rem;
+  font-size: 0.45rem;
+  text-shadow: 0.06rem 0.06rem 0 #4a5339;
+  opacity: 0.88;
+  animation: pixel-preview-float 1.8s steps(2, end) infinite;
+}
+
+.pixel-garden-map__preview .pixel-plant {
+  width: 2rem;
+  height: 2rem;
+}
+
+.pixel-garden-plot {
+  position: absolute;
+  left: var(--plot-left);
+  top: var(--plot-top);
+  display: grid;
+  place-items: center;
+  width: 13%;
+  height: 34%;
+  padding: 0;
+  color: color-mix(in srgb, var(--pixel-soil-light) 82%, white);
+  background: color-mix(in srgb, var(--pixel-soil-dark) 35%, transparent);
+  border: 0.1rem dashed color-mix(in srgb, var(--pixel-soil-light) 45%, transparent);
+  border-radius: 0.22rem;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.pixel-garden-plot:hover:not(:disabled) {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.pixel-garden-plot:focus-visible {
+  outline: 0.17rem solid #f7e493;
+  outline-offset: 0.1rem;
+}
+
+.pixel-garden-plot.is-empty {
+  background: color-mix(in srgb, var(--pixel-soil-dark) 30%, transparent);
+}
+
+.pixel-garden-plot.is-empty svg {
+  opacity: 0.62;
+}
+
+.pixel-garden-plot.is-occupied {
+  background: color-mix(in srgb, var(--pixel-soil-light) 42%, var(--pixel-soil-dark));
+  border-style: solid;
+  border-color: color-mix(in srgb, #f2d170 55%, var(--pixel-soil-dark));
+}
+
+.pixel-garden-plot.is-locked {
+  color: color-mix(in srgb, var(--pixel-soil-dark) 62%, var(--pixel-soil-light));
+  background: color-mix(in srgb, var(--pixel-soil-dark) 60%, transparent);
+  border-color: color-mix(in srgb, var(--pixel-soil-dark) 55%, transparent);
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.pixel-garden-plot.is-target {
+  background: #7ec05f;
+  border: 0.13rem solid #fff0a9;
+  box-shadow: 0 0 0 0.16rem color-mix(in srgb, #fff0a9 55%, transparent), 0 0.2rem 0 #477b44;
+  animation: pixel-plot-pulse 1.35s steps(2, end) infinite;
+}
+
+.pixel-garden-plot.is-selected {
+  border-color: #fff0a9;
+  box-shadow: 0 0 0 0.16rem #f2d170;
+}
+
+.pixel-garden-plot.is-moving {
+  border-color: #f6c274;
+  box-shadow: 0 0 0 0.14rem #b96d3c;
+}
+
+.pixel-garden-map__caption {
+  position: absolute;
+  z-index: 12;
+  inset: auto auto 4% 3%;
+  display: grid;
+  gap: 0.08rem;
+  padding: 0.28rem 0.42rem;
+  color: #fff4c7;
+  background: color-mix(in srgb, #4b713d 74%, transparent);
+  border: 0.1rem solid color-mix(in srgb, #f2d170 48%, transparent);
+  border-radius: 0.22rem;
+  font-size: 0.52rem;
+  line-height: 1.4;
+  text-shadow: 0.08rem 0.08rem 0 #425236;
+}
+
+.pixel-garden-map__caption span:last-child {
+  color: #e5f3a7;
+  font-size: 0.46rem;
+}
+
+.pixel-plant {
+  position: relative;
+  display: block;
+  width: 2.75rem;
+  height: 2.75rem;
+  filter: drop-shadow(0.12rem 0.16rem 0 rgba(61, 45, 36, 0.26));
+  pointer-events: none;
+}
+
+.pixel-plant__shadow {
+  position: absolute;
+  width: 80%;
+  height: 15%;
+  inset: auto 10% 3% auto;
+  background: color-mix(in srgb, var(--pixel-soil-dark) 50%, transparent);
+  border-radius: 50%;
+}
+
+.pixel-plant__trunk,
+.pixel-plant__canopy,
+.pixel-plant__petal,
+.pixel-plant__berry {
+  display: none;
+  position: absolute;
+}
+
+.pixel-plant__trunk {
+  width: 18%;
+  height: 58%;
+  inset: auto 41% 10% auto;
+  background: #75432b;
+  box-shadow: 0.18rem 0 #a46334;
+}
+
+.pixel-plant--tree .pixel-plant__trunk,
+.pixel-plant--flower .pixel-plant__trunk {
+  display: block;
+}
+
+.pixel-plant__canopy {
+  width: 45%;
+  height: 42%;
+  background: #2d824a;
+  border: 0.12rem solid #22653e;
+  border-radius: 0.42rem 0.16rem 0.34rem 0.12rem;
+}
+
+.pixel-plant--tree .pixel-plant__canopy,
+.pixel-plant--bush .pixel-plant__canopy {
+  display: block;
+}
+
+.pixel-plant--tree .pixel-plant__canopy--one { inset: 14% auto auto 7%; background: #3c9750; }
+.pixel-plant--tree .pixel-plant__canopy--two { inset: 3% 5% auto auto; background: #258047; }
+.pixel-plant--tree .pixel-plant__canopy--three { inset: 30% 25% auto auto; background: #55a65a; }
+.pixel-plant--bush .pixel-plant__canopy--one { inset: 28% auto auto 3%; background: #3f984e; }
+.pixel-plant--bush .pixel-plant__canopy--two { inset: 15% 19% auto auto; background: #268045; }
+.pixel-plant--bush .pixel-plant__canopy--three { inset: 34% 1% auto auto; background: #59a958; }
+
+.pixel-plant__petal {
+  width: 34%;
+  height: 34%;
+  background: #f4b8cf;
+  border: 0.1rem solid #b96787;
+  border-radius: 50% 20% 50% 20%;
+}
+
+.pixel-plant--flower .pixel-plant__petal { display: block; }
+.pixel-plant--flower .pixel-plant__petal--one { inset: 10% 22% auto auto; }
+.pixel-plant--flower .pixel-plant__petal--two { inset: 17% auto auto 17%; background: #f6d47b; }
+
+.pixel-plant__berry {
+  width: 15%;
+  height: 15%;
+  background: #f1c75e;
+  border: 0.08rem solid #9c5d36;
+  border-radius: 50%;
+}
+
+.pixel-plant--bush .pixel-plant__berry { display: block; }
+.pixel-plant--bush .pixel-plant__berry--one { inset: 31% auto auto 31%; }
+.pixel-plant--bush .pixel-plant__berry--two { inset: 47% 20% auto auto; background: #e99067; }
+
+.app-shell[data-theme="dark"] .pixel-garden-map {
+  --pixel-grass: #4d7b4a;
+  --pixel-grass-dark: #315b40;
+  --pixel-grass-light: #78a968;
+  --pixel-soil: #8e6139;
+  --pixel-soil-dark: #68472f;
+  --pixel-soil-light: #b4864d;
+  --pixel-path: #9c773d;
+  --pixel-wood: #744c36;
+  --pixel-wood-light: #a87549;
+  --pixel-roof: #713a37;
+  --pixel-water: #438d9b;
+  --pixel-ink: #f2dcae;
+  box-shadow: inset 0 0 0 0.2rem rgba(232, 211, 142, 0.08), 0 0.65rem 1.4rem rgba(0, 0, 0, 0.28);
+}
+
 .garden-board__heading {
   display: flex;
   align-items: center;
@@ -3030,6 +3736,16 @@ input:focus-visible {
   50% { transform: translateY(-0.12rem); }
 }
 
+@keyframes pixel-plot-pulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.18); }
+}
+
+@keyframes pixel-preview-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.18rem); }
+}
+
 @media (max-width: 720px) {
   .page-shell {
     width: min(100% - 1.25rem, 600px);
@@ -3249,6 +3965,68 @@ input:focus-visible {
   .garden-board__slots {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.35rem;
+  }
+
+  .garden-quickbar {
+    top: 0.35rem;
+    padding: 0.55rem;
+  }
+
+  .garden-quickbar__copy strong {
+    font-size: 0.64rem;
+  }
+
+  .garden-quickbar__copy small {
+    font-size: 0.52rem;
+  }
+
+  .pixel-garden-map {
+    aspect-ratio: 1.28 / 1;
+    border-radius: 0.8rem;
+  }
+
+  .pixel-garden-map__caption {
+    font-size: 0.44rem;
+  }
+
+  .pixel-garden-map__caption span:last-child {
+    font-size: 0.4rem;
+  }
+
+  .pixel-garden-map__preview {
+    min-width: 2.7rem;
+    font-size: 0.4rem;
+  }
+
+  .pixel-garden-map__plot-field {
+    width: 58%;
+    height: 43%;
+    inset: 39% auto auto 21%;
+  }
+
+  .pixel-house {
+    width: 31%;
+    height: 27%;
+    inset-inline-start: 34%;
+  }
+
+  .pixel-character {
+    width: 5%;
+    height: 12%;
+  }
+
+  .pixel-garden-plot {
+    width: 15%;
+    height: 36%;
+  }
+
+  .pixel-plant {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .garden-board {
+    padding: 0.65rem;
   }
 
   .garden-plot {

@@ -1,6 +1,6 @@
-import { Lock, MapPin, Move, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { Lock, MapPin, Move, Sparkles, Trash2, X } from "lucide-react";
 import { useEffect, useState, type Ref } from "react";
-import { GARDEN_DECOR, getNextDecor, getUnlockedDecor } from "../data/decor";
+import { GARDEN_DECOR, getNextDecor } from "../data/decor";
 import { GARDEN_SEEDS, getSeedDefinition } from "../data/garden";
 import {
   GARDEN_SLOT_COUNTS,
@@ -9,9 +9,8 @@ import {
   isGardenSeedUnlocked,
 } from "../lib/game";
 import { toPersianDigits } from "../lib/format";
-import type { GardenSeedKind, PlantedGardenItem, PlantStage } from "../types/game";
-import { GardenItemArtwork } from "./GardenItemArtwork";
-import { PlantArtwork } from "./PlantArtwork";
+import type { GardenSeedKind, PlantedGardenItem } from "../types/game";
+import { PixelGardenMap } from "./PixelGardenMap";
 
 interface GardenDecorProps {
   lifetimeWins: number;
@@ -26,20 +25,6 @@ interface GardenDecorProps {
   onRemove: (itemId: string) => void;
 }
 
-const ALL_SLOT_IDS = Array.from({ length: 12 }, (_, index) => `plot-${index + 1}`);
-
-function getUnlockAt(slotIndex: number): number {
-  return GARDEN_SLOT_COUNTS.find((stage) => slotIndex + 1 <= stage.count)?.unlockAt ?? 0;
-}
-
-function getSceneCopy(sceneKind: GardenSeedKind | null, hasPendingTree: boolean): string {
-  if (hasPendingTree) return "درخت امروز آماده‌ی کاشت است";
-  if (sceneKind === "tree") return "درختت اینجا ریشه دوانده ✨";
-  if (sceneKind === "flower") return "باغت دارد رنگ می‌گیرد";
-  if (sceneKind === "bush") return "یک گوشه‌ی سبز و نرم برای خودت";
-  return "اینجا جای رشدهای بعدی توست";
-}
-
 export function GardenDecor({
   lifetimeWins,
   plantedItems,
@@ -52,22 +37,11 @@ export function GardenDecor({
   onMove,
   onRemove,
 }: GardenDecorProps) {
-  const unlockedDecor = getUnlockedDecor(lifetimeWins);
   const nextDecor = getNextDecor(lifetimeWins);
   const unlockedSlotCount = getUnlockedGardenSlotCount(lifetimeWins);
   const unlockedSlotIds = getGardenSlotIds(lifetimeWins);
   const pendingTreeCount = pendingTreeSeedDays.length;
   const hasPendingTree = pendingTreeCount > 0;
-  const sceneItem = plantedItems.find((item) => item.kind === "tree") ?? plantedItems[0];
-  const sceneKind = hasPendingTree ? "tree" : sceneItem?.kind ?? null;
-  const sceneStage: PlantStage = sceneKind === "tree"
-    ? "tree"
-    : sceneKind === "flower"
-      ? "flower"
-      : sceneKind === "bush"
-        ? "flower"
-        : "seed";
-  const gardenCopy = getSceneCopy(sceneKind, hasPendingTree);
 
   const [plantingKind, setPlantingKind] = useState<GardenSeedKind | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -185,34 +159,10 @@ export function GardenDecor({
         </div>
       </div>
 
-      <div
-        className={`decor-card__scene decor-card__scene--${sceneStage} decor-card__scene--level-${Math.min(5, Math.max(0, Math.floor(lifetimeWins)))}`}
-        role="img"
-        aria-label={`باغ Apricity؛ ${gardenCopy}`}
-      >
-        <span className="decor-card__scene-sun" aria-hidden="true" />
-        <span className="decor-card__scene-cloud decor-card__scene-cloud--one" aria-hidden="true" />
-        <span className="decor-card__scene-cloud decor-card__scene-cloud--two" aria-hidden="true" />
-        <span className="decor-card__scene-hill decor-card__scene-hill--back" aria-hidden="true" />
-        <span className="decor-card__scene-hill decor-card__scene-hill--front" aria-hidden="true" />
-        <span className="decor-card__scene-path" aria-hidden="true" />
-        <span className="decor-card__scene-plant" aria-hidden="true">
-          {sceneKind
-            ? <GardenItemArtwork kind={sceneKind} idPrefix={`garden-scene-${sceneItem?.id ?? "preview"}`} />
-            : <PlantArtwork stage="seed" idPrefix="garden-scene-seed" />}
-        </span>
-        {unlockedDecor.map((decor) => (
-          <span key={decor.id} className={`decor-card__scene-item decor-card__scene-item--${decor.id}`} title={decor.label} aria-label={decor.label}>
-            {decor.emoji}
-          </span>
-        ))}
-        <span className="decor-card__scene-note">{gardenCopy}</span>
-      </div>
-
       <div className="garden-board" aria-label="باغ قابل کاشت">
         <div className="garden-board__heading">
           <div>
-            <p className="eyebrow">گوشه‌های باغ</p>
+            <p className="eyebrow">زمین‌های کوچیک باغ</p>
             <strong>{hasPendingTree ? "درختت آماده‌ست؛ یک جای خوب براش پیدا کن" : "هر چیزی که دوست داری اینجا بکار"}</strong>
           </div>
           <span className="garden-board__capacity"><MapPin size={14} /> {toPersianDigits(plantedItems.length)} / {toPersianDigits(unlockedSlotCount)}</span>
@@ -238,43 +188,15 @@ export function GardenDecor({
           </div>
         )}
 
-        <div className="garden-board__slots" role="grid" aria-label="جایگاه‌های باغ">
-          {ALL_SLOT_IDS.map((slotId, index) => {
-            const item = plantedItems.find((candidate) => candidate.slotId === slotId);
-            const unlocked = unlockedSlotIds.includes(slotId);
-            const targetSlot = Boolean(plantingKind || movingItemId) && unlocked && !item;
-            const selected = item?.id === selectedItemId;
-            const unlockAt = getUnlockAt(index);
-            return (
-              <button
-                key={slotId}
-                type="button"
-                role="gridcell"
-                className={`garden-plot${unlocked ? "" : " garden-plot--locked"}${item ? " garden-plot--occupied" : " garden-plot--empty"}${targetSlot ? " is-target" : ""}${selected ? " is-selected" : ""}${movingItemId === item?.id ? " is-moving" : ""}`}
-                onClick={() => handleSlotClick(slotId, item)}
-                disabled={!unlocked}
-                aria-label={item
-                  ? `${getSeedDefinition(item.kind).label} در جایگاه ${toPersianDigits(index + 1)}`
-                  : unlocked
-                    ? `جایگاه خالی ${toPersianDigits(index + 1)}`
-                    : `جایگاه قفل است؛ بعد از ${toPersianDigits(unlockAt)} برد باز می‌شود`}
-              >
-                {item ? (
-                  <span className="garden-plot__art" aria-hidden="true">
-                    <GardenItemArtwork kind={item.kind} idPrefix={`garden-plot-${item.id}`} />
-                  </span>
-                ) : unlocked ? (
-                  <span className="garden-plot__empty-icon" aria-hidden="true"><Plus size={18} /></span>
-                ) : (
-                  <span className="garden-plot__lock" aria-hidden="true"><Lock size={15} /></span>
-                )}
-                <span className="garden-plot__label">
-                  {item ? getSeedDefinition(item.kind).label : unlocked ? "جای خالی" : `برد ${toPersianDigits(unlockAt)}`}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        <PixelGardenMap
+          plantedItems={plantedItems}
+          unlockedSlotIds={unlockedSlotIds}
+          plantingKind={plantingKind}
+          movingItemId={movingItemId}
+          selectedItemId={selectedItemId}
+          pendingTreeReady={hasPendingTree}
+          onSlotClick={handleSlotClick}
+        />
 
         {selectedItem && !movingItemId && (
           <div className="garden-item-actions" role="group" aria-label={`مدیریت ${getSeedDefinition(selectedItem.kind).label}`}>
