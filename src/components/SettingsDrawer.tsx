@@ -32,14 +32,13 @@ export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddR
   const [draftReward, setDraftReward] = useState("");
 
   useEffect(() => {
-    if (open) {
-      setDraftName(profile.displayName);
-      setDraftNickname(profile.nickname);
-      setDraftPalette(profile.palette);
-      setDraftTheme(profile.theme);
-      setDraftReward("");
-    }
-  }, [open, profile.displayName, profile.nickname, profile.palette, profile.theme]);
+    if (!open) return;
+    setDraftName(profile.displayName);
+    setDraftNickname(profile.nickname);
+    setDraftPalette(profile.palette);
+    setDraftTheme(profile.theme);
+    setDraftReward("");
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -52,15 +51,8 @@ export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddR
 
   if (!open) return null;
 
-  const save = () => {
-    onSave({
-      displayName: draftName.trim() || "فاطمه",
-      nickname: draftNickname.trim() || "Apricity",
-      avatarSeed: profile.avatarSeed,
-      palette: draftPalette,
-      theme: draftTheme,
-    });
-    onClose();
+  const updateProfile = (changes: Partial<Profile>) => {
+    onSave({ ...profile, ...changes });
   };
 
   const addReward = () => {
@@ -92,12 +84,21 @@ export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddR
           </button>
         </div>
 
+        <p className="settings-live-hint">
+          <span aria-hidden="true">✦</span>
+          تغییرها همین لحظه ذخیره می‌شن؛ لازم نیست دنبال دکمه‌ی ذخیره بگردی.
+        </p>
+
         <label className="field-label" htmlFor="display-name">دوست داری با چه اسمی صدات کنیم؟</label>
         <input
           id="display-name"
           className="text-input"
           value={draftName}
-          onChange={(event) => setDraftName(event.target.value)}
+          onChange={(event) => {
+            const nextName = event.target.value;
+            setDraftName(nextName);
+            updateProfile({ displayName: nextName.trim() || "فاطمه" });
+          }}
           maxLength={24}
           autoComplete="off"
         />
@@ -107,7 +108,11 @@ export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddR
           id="garden-nickname"
           className="text-input"
           value={draftNickname}
-          onChange={(event) => setDraftNickname(event.target.value)}
+          onChange={(event) => {
+            const nextNickname = event.target.value;
+            setDraftNickname(nextNickname);
+            updateProfile({ nickname: nextNickname.trim() || "Apricity" });
+          }}
           maxLength={24}
           autoComplete="off"
         />
@@ -121,7 +126,10 @@ export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddR
                 className={`palette-option${selected ? " is-selected" : ""}`}
                 type="button"
                 key={palette.id}
-                onClick={() => setDraftPalette(palette.id)}
+                onClick={() => {
+                  setDraftPalette(palette.id);
+                  updateProfile({ palette: palette.id });
+                }}
                 aria-pressed={selected}
               >
                 <span className="palette-swatches" aria-hidden="true">
@@ -144,7 +152,10 @@ export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddR
                 className={`theme-option${selected ? " is-selected" : ""}`}
                 type="button"
                 key={id}
-                onClick={() => setDraftTheme(id)}
+                onClick={() => {
+                  setDraftTheme(id);
+                  updateProfile({ theme: id });
+                }}
                 aria-pressed={selected}
               >
                 <span className="theme-option__icon"><Icon size={17} /></span>
@@ -194,8 +205,6 @@ export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddR
             ))}
           </div>
         </div>
-
-        <button type="button" className="primary-button drawer-save" onClick={save}>ذخیره‌ی تغییرات</button>
       </aside>
     </div>
   );

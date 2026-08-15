@@ -1752,6 +1752,25 @@ input:focus-visible {
   line-height: 1.7;
 }
 
+.settings-live-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: -0.35rem 0 0.1rem;
+  padding: 0.65rem 0.75rem;
+  color: var(--primary-deep);
+  background: var(--primary-soft);
+  border-radius: 0.9rem;
+  font-size: 0.68rem;
+  line-height: 1.7;
+}
+
+.settings-live-hint span {
+  flex: 0 0 auto;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
 .reward-manager {
   display: grid;
   gap: 0.55rem;

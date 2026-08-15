@@ -179,7 +179,6 @@ export default function App() {
 
   const handleProfileSave = (profile: Profile) => {
     setGameState((current) => setProfile(current, profile));
-    showToast("باغت با سلیقه‌ی تو ذخیره شد 🌷");
   };
 
   const handleAddTask = (task: TaskDefinition) => {
