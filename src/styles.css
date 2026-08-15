@@ -1192,6 +1192,7 @@ input:focus-visible {
 
 .reward-option {
   justify-content: space-between;
+  align-items: flex-start;
   gap: 0.45rem;
   min-width: 0;
   padding: 0.65rem 0.7rem;
@@ -1204,10 +1205,12 @@ input:focus-visible {
 }
 
 .reward-option span {
-  overflow: hidden;
+  display: block;
+  min-width: 0;
   font-size: 0.68rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .reward-option:hover,
@@ -1225,6 +1228,52 @@ input:focus-visible {
   color: var(--muted);
   font-size: 0.7rem;
   text-align: center;
+}
+
+.app-crash-fallback {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 1.25rem;
+  color: #5d536e;
+  background: #fff8f0;
+}
+
+.app-crash-fallback__card {
+  width: min(100%, 28rem);
+  padding: 2rem 1.4rem;
+  text-align: center;
+  background: #fffdfb;
+  border: 1px solid rgba(119, 91, 137, 0.14);
+  border-radius: 2rem;
+  box-shadow: 0 1.5rem 4rem rgba(86, 63, 94, 0.12);
+}
+
+.app-crash-fallback__icon {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 0.8rem;
+  font-size: 2rem;
+  background: #dff3e9;
+  border-radius: 1.35rem;
+}
+
+.app-crash-fallback h1 {
+  margin: 0.45rem 0 0;
+  color: #433c52;
+  font-size: 1.25rem;
+}
+
+.app-crash-fallback p:not(.eyebrow) {
+  margin: 0.8rem auto 0;
+  color: #6b6177;
+  line-height: 1.9;
+}
+
+.app-crash-fallback .primary-button {
+  margin-top: 1rem;
 }
 
 .install-prompt {
@@ -2026,7 +2075,7 @@ input:focus-visible {
   }
 
   .reward-option {
-    min-height: 2.5rem;
+    min-height: 3.4rem;
   }
 
   .week-memory {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "apricity-shell-v3";
+const CACHE_NAME = "apricity-shell-v4";
 const APP_SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./icon-192.svg", "./icon-512.svg"];
 
 self.addEventListener("install", (event) => {
@@ -32,7 +32,7 @@ self.addEventListener("fetch", (event) => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
         return response;
-      }).catch(() => caches.match("./index.html"));
+      }).catch(() => request.mode === "navigate" ? caches.match("./index.html") : Response.error());
     }),
   );
 });

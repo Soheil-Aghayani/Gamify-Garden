@@ -7,7 +7,9 @@ interface BeforeInstallPromptEvent extends Event {
 
 function isStandaloneMode(): boolean {
   const navigatorWithStandalone = navigator as Navigator & { standalone?: boolean };
-  return window.matchMedia("(display-mode: standalone)").matches || navigatorWithStandalone.standalone === true;
+  const displayModeMatches = typeof window.matchMedia === "function"
+    && window.matchMedia("(display-mode: standalone)").matches;
+  return displayModeMatches || navigatorWithStandalone.standalone === true;
 }
 
 function isIosDevice(): boolean {
