@@ -8,6 +8,7 @@ import {
   getFlowStep,
   getLongTermPlantStage,
   markIntroSeen,
+  openLoveCapsule,
   removeTask,
   restoreTask,
   setTodayEnergy,
@@ -151,5 +152,13 @@ describe("Gamify Garden game rules", () => {
 
     expect(state.rewards).toContain("چای و موسیقی");
     expect(state.rewards.filter((reward) => reward === "چای و موسیقی")).toHaveLength(1);
+  });
+
+  it("remembers opened love capsules without duplicates", () => {
+    let state = freshState();
+    state = openLoveCapsule(state, "warmth-01");
+    state = openLoveCapsule(state, "warmth-01");
+
+    expect(state.openedLoveCapsuleIds).toEqual(["warmth-01"]);
   });
 });

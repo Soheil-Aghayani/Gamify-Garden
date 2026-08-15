@@ -326,6 +326,7 @@ input:focus-visible {
 .section-heading h2,
 .growth-card h2,
 .reward-card h2,
+.love-capsule h2,
 .settings-drawer h2 {
   margin: 0;
 }
@@ -1172,6 +1173,139 @@ input:focus-visible {
     color-mix(in srgb, var(--primary-soft) 54%, var(--surface));
 }
 
+.love-capsule {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.85rem;
+  padding: 1.1rem 1.25rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--lavender) 58%, transparent), transparent 13rem),
+    radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--peach) 42%, transparent), transparent 12rem),
+    var(--surface);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.love-capsule::before {
+  content: "";
+  position: absolute;
+  width: 10rem;
+  height: 10rem;
+  inset: -6rem auto auto -3.5rem;
+  background: color-mix(in srgb, var(--primary-soft) 72%, transparent);
+  border-radius: 50%;
+}
+
+.love-capsule.is-opened {
+  border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
+.love-capsule__icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 auto;
+  color: var(--warm-ink);
+  background: color-mix(in srgb, var(--peach) 72%, var(--surface-solid));
+  border: 1px solid color-mix(in srgb, var(--warm-ink) 14%, transparent);
+  border-radius: 1rem 1rem 1rem 0.45rem;
+  transform: rotate(-5deg);
+  box-shadow: 0 0.65rem 1.2rem color-mix(in srgb, var(--peach) 30%, transparent);
+}
+
+.love-capsule__icon span {
+  position: absolute;
+  inset: -0.55rem auto auto -0.45rem;
+  color: var(--primary);
+  font-size: 0.85rem;
+  transform: rotate(5deg);
+}
+
+.love-capsule.is-opened .love-capsule__icon {
+  color: var(--sun-ink);
+  background: var(--sun);
+  border-color: transparent;
+  animation: capsule-open 520ms both;
+}
+
+.love-capsule__content {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.love-capsule__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.love-capsule__heading h2 {
+  color: var(--ink-strong);
+  font-size: 1rem;
+  letter-spacing: -0.025em;
+}
+
+.love-capsule__copy {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.75;
+}
+
+.love-capsule__open {
+  margin-top: 0.85rem;
+  padding: 0.62rem 0.85rem;
+  font-size: 0.7rem;
+}
+
+.love-capsule__message {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.7rem;
+  margin-top: 0.9rem;
+  padding: 0.9rem;
+  background: color-mix(in srgb, var(--surface-strong) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+  border-radius: 1.15rem;
+  animation: capsule-open 480ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+}
+
+.love-capsule__message-mark {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: var(--primary-soft);
+  border-radius: 0.8rem;
+  font-size: 1.2rem;
+}
+
+.love-capsule__message h3 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 0.86rem;
+}
+
+.love-capsule__message p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.9;
+}
+
+.love-capsule__message .eyebrow {
+  margin-bottom: 0.2rem;
+  font-size: 0.64rem;
+}
+
 .reward-options {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1893,6 +2027,11 @@ input:focus-visible {
   100% { transform: scale(1); }
 }
 
+@keyframes capsule-open {
+  from { opacity: 0; transform: translateY(0.35rem) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -2095,6 +2234,26 @@ input:focus-visible {
 
   .reward-option {
     min-height: 3.4rem;
+  }
+
+  .love-capsule {
+    gap: 0.7rem;
+    padding: 1rem;
+    border-radius: 1.35rem;
+  }
+
+  .love-capsule__icon {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+
+  .love-capsule__heading {
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .love-capsule__heading .tiny-badge {
+    align-self: flex-start;
   }
 
   .week-memory {

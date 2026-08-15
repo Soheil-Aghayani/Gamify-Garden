@@ -43,6 +43,7 @@ export function createInitialState(): GameState {
     hasSeenIntro: false,
     rewards: [...DEFAULT_REWARDS],
     rewardCatalogVersion: REWARD_CATALOG_VERSION,
+    openedLoveCapsuleIds: [],
   };
 }
 
@@ -261,4 +262,12 @@ export function setTodayReward(
 
 export function setProfile(state: GameState, profile: Profile): GameState {
   return { ...state, profile };
+}
+
+export function openLoveCapsule(state: GameState, capsuleId: string): GameState {
+  if (!capsuleId || state.openedLoveCapsuleIds.includes(capsuleId)) return state;
+  return {
+    ...state,
+    openedLoveCapsuleIds: [...state.openedLoveCapsuleIds, capsuleId],
+  };
 }

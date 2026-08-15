@@ -57,4 +57,5 @@ export interface GameState {
   hasSeenIntro: boolean;
   rewards: string[];
   rewardCatalogVersion: number;
+  openedLoveCapsuleIds: string[];
 }

@@ -9,6 +9,7 @@ import {
   getDayState,
   getFlowStep,
   markIntroSeen,
+  openLoveCapsule,
   removeTask,
   removeReward,
   restoreTask,
@@ -24,6 +25,7 @@ import { GardenHeader } from "./components/GardenHeader";
 import { GrowthScene } from "./components/GrowthScene";
 import { GuideDrawer } from "./components/GuideDrawer";
 import { InstallPrompt } from "./components/InstallPrompt";
+import { LoveCapsule } from "./components/LoveCapsule";
 import { QuestGrid } from "./components/QuestGrid";
 import { RewardBanner } from "./components/RewardBanner";
 import { SettingsDrawer } from "./components/SettingsDrawer";
@@ -62,6 +64,7 @@ export default function App() {
   const energyRef = useRef<HTMLElement | null>(null);
   const questsRef = useRef<HTMLElement | null>(null);
   const rewardRef = useRef<HTMLElement | null>(null);
+  const loveCapsuleRef = useRef<HTMLElement | null>(null);
   const previousFlowStep = useRef<FlowStep | null>(null);
   const today = getDayState(gameState, todayKey);
   const target = getDailyTarget(gameState);
@@ -130,7 +133,8 @@ export default function App() {
     if (previousStep !== null && previousStep !== flowStep) {
       if (flowStep === "energy") focusSection(energyRef);
       if (flowStep === "tasks") focusSection(questsRef);
-      if (flowStep === "reward" || flowStep === "done") focusSection(rewardRef);
+      if (flowStep === "reward") focusSection(rewardRef);
+      if (flowStep === "done") focusSection(loveCapsuleRef);
     }
     previousFlowStep.current = flowStep;
   }, [flowStep]);
@@ -175,6 +179,11 @@ export default function App() {
   const handleReward = (reward: string) => {
     setGameState((current) => setTodayReward(current, reward, todayKey));
     showToast("انتخاب قشنگی بود 💛");
+  };
+
+  const handleLoveCapsuleOpen = (capsuleId: string) => {
+    setGameState((current) => openLoveCapsule(current, capsuleId));
+    showToast("این گرمای کوچولو برای تو بود 💌");
   };
 
   const handleProfileSave = (profile: Profile) => {
@@ -282,6 +291,13 @@ export default function App() {
             isNext={flowStep === "reward"}
             sectionRef={rewardRef}
             onChoose={handleReward}
+          />
+          <LoveCapsule
+            dailyWin={today.dailyWin}
+            dayKey={todayKey}
+            openedCapsuleIds={gameState.openedLoveCapsuleIds}
+            sectionRef={loveCapsuleRef}
+            onOpen={handleLoveCapsuleOpen}
           />
         </div>
 

@@ -127,6 +127,13 @@ function normalizeState(value: unknown): GameState {
     ? savedRewards
     : [...DEFAULT_REWARDS, ...savedRewards]
   ).filter((reward, index, list) => list.indexOf(reward) === index).slice(0, 20);
+  const openedLoveCapsuleIds = Array.isArray(candidate.openedLoveCapsuleIds)
+    ? candidate.openedLoveCapsuleIds
+      .filter((id): id is string => typeof id === "string" && id.trim().length > 0)
+      .map((id) => id.trim().slice(0, 80))
+      .filter((id, index, list) => list.indexOf(id) === index)
+      .slice(0, 100)
+    : [];
 
   return recalculateStats({
     ...initial,
@@ -145,6 +152,7 @@ function normalizeState(value: unknown): GameState {
     hasSeenIntro: typeof candidate.hasSeenIntro === "boolean" ? candidate.hasSeenIntro : true,
     rewards: rewards.length > 0 ? rewards : [...DEFAULT_REWARDS],
     rewardCatalogVersion: REWARD_CATALOG_VERSION,
+    openedLoveCapsuleIds,
   });
 }
 
