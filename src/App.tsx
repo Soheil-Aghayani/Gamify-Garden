@@ -50,6 +50,9 @@ export default function App() {
   const [guideOpen, setGuideOpen] = useState(false);
   const [taskManagerOpen, setTaskManagerOpen] = useState(false);
   const [installDismissed, setInstallDismissed] = useState(false);
+  const [systemPrefersDark, setSystemPrefersDark] = useState(() => (
+    typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches
+  ));
   const [todayKey, setTodayKey] = useState(() => getDayKey());
   const [toast, setToast] = useState<ToastState | null>(null);
   const toastTimer = useRef<number | undefined>(undefined);
@@ -64,6 +67,9 @@ export default function App() {
   const dailyAvatar = getDailyAvatar(gameState.profile.avatarSeed, todayKey);
   const installPrompt = useInstallPrompt();
   const isDrawerOpen = guideOpen || settingsOpen || taskManagerOpen;
+  const resolvedTheme = gameState.profile.theme === "system"
+    ? (systemPrefersDark ? "dark" : "light")
+    : gameState.profile.theme;
 
   useBodyScrollLock(isDrawerOpen);
 
@@ -75,7 +81,16 @@ export default function App() {
     document.title = `${gameState.profile.nickname} | باغ قدم‌های کوچک`;
     document.documentElement.lang = "fa";
     document.documentElement.dir = "rtl";
-  }, [gameState.profile.nickname]);
+    document.documentElement.dataset.theme = resolvedTheme;
+    document.documentElement.style.colorScheme = resolvedTheme;
+  }, [gameState.profile.nickname, resolvedTheme]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (event: MediaQueryListEvent) => setSystemPrefersDark(event.matches);
+    mediaQuery.addEventListener?.("change", handleChange);
+    return () => mediaQuery.removeEventListener?.("change", handleChange);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -196,6 +211,7 @@ export default function App() {
     <div
       className="app-shell"
       data-palette={gameState.profile.palette}
+      data-theme={resolvedTheme}
       onContextMenu={(event) => {
         const target = event.target as HTMLElement;
         if (!target.closest("input, textarea, [contenteditable='true']")) event.preventDefault();

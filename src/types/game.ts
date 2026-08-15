@@ -3,6 +3,7 @@ export type QuestId = string;
 export type EnergyLevel = 1 | 2 | 3;
 export type PlantStage = "seed" | "sprout" | "flower" | "tree";
 export type PaletteId = "mint" | "lilac" | "peach";
+export type ThemeMode = "light" | "dark" | "system";
 export type FlowStep = "intro" | "energy" | "tasks" | "reward" | "done" | "manage";
 export type TaskIconKey =
   | "brain"
@@ -43,6 +44,7 @@ export interface Profile {
   nickname: string;
   avatarSeed: string;
   palette: PaletteId;
+  theme: ThemeMode;
 }
 
 export interface GameState {

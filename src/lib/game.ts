@@ -19,6 +19,7 @@ export const DEFAULT_PROFILE: Profile = {
   nickname: "Apricity",
   avatarSeed: "fatemeh-apricity",
   palette: "mint",
+  theme: "light",
 };
 
 export function createEmptyDay(dayKey = getDayKey()): DailyState {

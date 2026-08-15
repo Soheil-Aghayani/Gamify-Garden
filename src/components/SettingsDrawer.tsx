@@ -1,6 +1,6 @@
-import { Check, Palette, Plus, Settings2, Trash2, X } from "lucide-react";
+import { Check, Monitor, Moon, Palette, Plus, Settings2, Sun, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { PaletteId, Profile } from "../types/game";
+import type { PaletteId, Profile, ThemeMode } from "../types/game";
 
 interface SettingsDrawerProps {
   open: boolean;
@@ -18,10 +18,17 @@ const PALETTES: Array<{ id: PaletteId; label: string; colors: string[] }> = [
   { id: "peach", label: "هلویی", colors: ["#ffc8b6", "#ffe3b9", "#c7e9dc"] },
 ];
 
+const THEMES: Array<{ id: ThemeMode; label: string; description: string; Icon: typeof Sun }> = [
+  { id: "light", label: "روز روشن", description: "نرم و نورانی", Icon: Sun },
+  { id: "dark", label: "شب آرام", description: "تیره و پاستیلی", Icon: Moon },
+  { id: "system", label: "هماهنگ", description: "با تنظیم گوشی", Icon: Monitor },
+];
+
 export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddReward, onRemoveReward }: SettingsDrawerProps) {
   const [draftName, setDraftName] = useState(profile.displayName);
   const [draftNickname, setDraftNickname] = useState(profile.nickname);
   const [draftPalette, setDraftPalette] = useState<PaletteId>(profile.palette);
+  const [draftTheme, setDraftTheme] = useState<ThemeMode>(profile.theme);
   const [draftReward, setDraftReward] = useState("");
 
   useEffect(() => {
@@ -29,9 +36,10 @@ export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddR
       setDraftName(profile.displayName);
       setDraftNickname(profile.nickname);
       setDraftPalette(profile.palette);
+      setDraftTheme(profile.theme);
       setDraftReward("");
     }
-  }, [open, profile.displayName, profile.nickname, profile.palette]);
+  }, [open, profile.displayName, profile.nickname, profile.palette, profile.theme]);
 
   useEffect(() => {
     if (!open) return;
@@ -50,6 +58,7 @@ export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddR
       nickname: draftNickname.trim() || "Apricity",
       avatarSeed: profile.avatarSeed,
       palette: draftPalette,
+      theme: draftTheme,
     });
     onClose();
   };
@@ -120,6 +129,30 @@ export function SettingsDrawer({ open, profile, rewards, onClose, onSave, onAddR
                 </span>
                 <span>{palette.label}</span>
                 {selected && <Check size={16} />}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="settings-divider" />
+        <div className="field-label"><Moon size={16} /> حال‌وهوای نمایش</div>
+        <div className="theme-options" role="group" aria-label="انتخاب حالت نمایش">
+          {THEMES.map(({ id, label, description, Icon }) => {
+            const selected = id === draftTheme;
+            return (
+              <button
+                className={`theme-option${selected ? " is-selected" : ""}`}
+                type="button"
+                key={id}
+                onClick={() => setDraftTheme(id)}
+                aria-pressed={selected}
+              >
+                <span className="theme-option__icon"><Icon size={17} /></span>
+                <span className="theme-option__copy">
+                  <strong>{label}</strong>
+                  <small>{description}</small>
+                </span>
+                {selected && <Check size={15} />}
               </button>
             );
           })}

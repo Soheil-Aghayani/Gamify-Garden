@@ -1,7 +1,7 @@
 import { DEFAULT_TASKS } from "../data/quests";
 import { DEFAULT_REWARDS, REWARD_CATALOG_VERSION } from "../data/rewards";
 import { createInitialState, recalculateStats } from "./game";
-import type { DailyState, GameState, PaletteId, QuestId, TaskDefinition, TaskIconKey } from "../types/game";
+import type { DailyState, GameState, PaletteId, QuestId, TaskDefinition, TaskIconKey, ThemeMode } from "../types/game";
 
 export const STORAGE_KEY = "gamify-garden:v1";
 
@@ -25,6 +25,10 @@ function isQuestId(value: unknown): value is QuestId {
 
 function isPalette(value: unknown): value is PaletteId {
   return value === "mint" || value === "lilac" || value === "peach";
+}
+
+function isThemeMode(value: unknown): value is ThemeMode {
+  return value === "light" || value === "dark" || value === "system";
 }
 
 function isTaskIconKey(value: unknown): value is TaskIconKey {
@@ -134,6 +138,7 @@ function normalizeState(value: unknown): GameState {
           : initial.profile.nickname,
       avatarSeed,
       palette: isPalette(candidate.profile?.palette) ? candidate.profile.palette : initial.profile.palette,
+      theme: isThemeMode(candidate.profile?.theme) ? candidate.profile.theme : initial.profile.theme,
     },
     tasks: safeTasks,
     days,
