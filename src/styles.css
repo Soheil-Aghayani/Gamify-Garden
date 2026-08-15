@@ -1426,6 +1426,61 @@ input:focus-visible {
   box-shadow: 0 0 0 0.3rem color-mix(in srgb, var(--primary) 8%, transparent), var(--shadow);
 }
 
+.decor-card {
+  overflow: visible;
+}
+
+.garden-quickbar {
+  position: sticky;
+  z-index: 8;
+  top: max(0.55rem, env(safe-area-inset-top));
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.65rem;
+  background: color-mix(in srgb, var(--surface-solid) 86%, var(--primary-soft));
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  border-radius: 1rem;
+  box-shadow: 0 0.7rem 1.8rem color-mix(in srgb, var(--ink-strong) 8%, transparent);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.garden-quickbar__copy {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary-deep);
+}
+
+.garden-quickbar__copy > span:last-child {
+  display: grid;
+  gap: 0.05rem;
+}
+
+.garden-quickbar__copy strong {
+  color: var(--ink-strong);
+  font-size: 0.7rem;
+}
+
+.garden-quickbar__copy small {
+  color: var(--muted);
+  font-size: 0.58rem;
+}
+
+.garden-quickbar__icon {
+  display: grid;
+  place-items: center;
+  width: 2.05rem;
+  height: 2.05rem;
+  background: var(--primary-soft);
+  border-radius: 0.7rem;
+  font-size: 1.15rem;
+}
+
+.garden-quickbar .garden-seed-tray {
+  gap: 0.35rem;
+}
+
 .garden-board {
   display: grid;
   gap: 0.7rem;

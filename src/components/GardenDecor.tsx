@@ -127,6 +127,29 @@ export function GardenDecor({
     setSelectedItemId(null);
   };
 
+  const seedOptions = GARDEN_SEEDS.map((seed) => {
+    const unlocked = isGardenSeedUnlocked(seed.kind, lifetimeWins, pendingTreeCount);
+    const selected = plantingKind === seed.kind;
+    const isTreePending = seed.kind === "tree" && pendingTreeCount > 0;
+    return (
+      <button
+        key={seed.kind}
+        type="button"
+        className={`garden-seed-option garden-seed-option--${seed.color}${selected ? " is-selected" : ""}${!unlocked ? " is-locked" : ""}`}
+        onClick={() => chooseSeed(seed.kind)}
+        disabled={!unlocked}
+        aria-pressed={selected}
+        title={seed.copy}
+      >
+        <span className="garden-seed-option__emoji" aria-hidden="true">{unlocked ? seed.emoji : <Lock size={16} />}</span>
+        <span className="garden-seed-option__copy">
+          <strong>{seed.label}</strong>
+          <small>{isTreePending ? `${toPersianDigits(pendingTreeCount)} دانه` : unlocked ? "آزاد است" : seed.copy}</small>
+        </span>
+      </button>
+    );
+  });
+
   return (
     <section
       ref={sectionRef}
@@ -147,6 +170,19 @@ export function GardenDecor({
             ? `${toPersianDigits(pendingTreeCount)} درخت آماده‌ی کاشت`
             : `${toPersianDigits(plantedItems.length)} از ${toPersianDigits(unlockedSlotCount)} جایگاه`}
         </span>
+      </div>
+
+      <div className="garden-quickbar" aria-label="نوار کاشت باغ">
+        <div className="garden-quickbar__copy">
+          <span className="garden-quickbar__icon" aria-hidden="true">🌱</span>
+          <span>
+            <strong>نوار کاشت</strong>
+            <small>{plantingKind ? "حالا یک جای خالی را لمس کن" : "یک دانه را انتخاب کن و بکار"}</small>
+          </span>
+        </div>
+        <div className="garden-seed-tray garden-seed-tray--quick">
+          {seedOptions}
+        </div>
       </div>
 
       <div
@@ -251,31 +287,6 @@ export function GardenDecor({
             </button>
           </div>
         )}
-
-        <div className="garden-seed-tray" aria-label="دانه‌های باغ">
-          {GARDEN_SEEDS.map((seed) => {
-            const unlocked = isGardenSeedUnlocked(seed.kind, lifetimeWins, pendingTreeCount);
-            const selected = plantingKind === seed.kind;
-            const isTreePending = seed.kind === "tree" && pendingTreeCount > 0;
-            return (
-              <button
-                key={seed.kind}
-                type="button"
-                className={`garden-seed-option garden-seed-option--${seed.color}${selected ? " is-selected" : ""}${!unlocked ? " is-locked" : ""}`}
-                onClick={() => chooseSeed(seed.kind)}
-                disabled={!unlocked}
-                aria-pressed={selected}
-                title={seed.copy}
-              >
-                <span className="garden-seed-option__emoji" aria-hidden="true">{unlocked ? seed.emoji : <Lock size={16} />}</span>
-                <span className="garden-seed-option__copy">
-                  <strong>{seed.label}</strong>
-                  <small>{isTreePending ? `${toPersianDigits(pendingTreeCount)} دانه` : unlocked ? "آزاد است" : seed.copy}</small>
-                </span>
-              </button>
-            );
-          })}
-        </div>
 
         {hasPendingTree && !deferredTreePlanting && !plantingKind && (
           <div className="garden-board__plant-cta">
