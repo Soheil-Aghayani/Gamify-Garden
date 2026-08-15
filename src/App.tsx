@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getDailyAvatar } from "./lib/avatar";
-import { getDayKey, getPersianDateSummary } from "./lib/date";
+import { getDayKey, getPersianDateSummary, getPersianGreeting } from "./lib/date";
 import { toPersianDigits } from "./lib/format";
 import {
   addTask,
@@ -59,6 +59,7 @@ export default function App() {
   const [installDismissed, setInstallDismissed] = useState(false);
   const [systemPrefersDark, setSystemPrefersDark] = useState(prefersDarkMode);
   const [todayKey, setTodayKey] = useState(() => getDayKey());
+  const [currentTime, setCurrentTime] = useState(() => new Date());
   const [toast, setToast] = useState<ToastState | null>(null);
   const toastTimer = useRef<number | undefined>(undefined);
   const energyRef = useRef<HTMLElement | null>(null);
@@ -69,7 +70,8 @@ export default function App() {
   const today = getDayState(gameState, todayKey);
   const target = getDailyTarget(gameState);
   const flowStep = getFlowStep(gameState, todayKey);
-  const todaySummary = getPersianDateSummary();
+  const todaySummary = getPersianDateSummary(currentTime);
+  const greeting = getPersianGreeting(currentTime);
   const dailyAvatar = getDailyAvatar(gameState.profile.avatarSeed, todayKey);
   const installPrompt = useInstallPrompt();
   const isDrawerOpen = guideOpen || settingsOpen || taskManagerOpen;
@@ -111,7 +113,9 @@ export default function App() {
 
   useEffect(() => {
     const dayTimer = window.setInterval(() => {
-      const nextDayKey = getDayKey();
+      const now = new Date();
+      const nextDayKey = getDayKey(now);
+      setCurrentTime(now);
       setTodayKey((currentDayKey) => currentDayKey === nextDayKey ? currentDayKey : nextDayKey);
     }, 60_000);
     return () => window.clearInterval(dayTimer);
@@ -242,6 +246,7 @@ export default function App() {
       <main className="page-shell">
         <GardenHeader
           displayName={gameState.profile.displayName}
+          greeting={greeting}
           nickname={gameState.profile.nickname}
           avatarSeed={dailyAvatar.seed}
           avatarVariant={dailyAvatar.variant}

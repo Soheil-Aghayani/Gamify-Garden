@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getDailyAvatar } from "./avatar";
-import { getPersianDateSummary } from "./date";
+import { getPersianDateSummary, getPersianGreeting } from "./date";
 import { getDailyRewardOptions } from "./game";
 
 describe("daily garden details", () => {
@@ -30,5 +30,13 @@ describe("daily garden details", () => {
     expect(summary.weekday).toBeTruthy();
     expect(summary.date).toMatch(/[۰-۹]/);
     expect(summary.ariaLabel).toContain(summary.weekday);
+  });
+
+  it("greets Fatemeh according to the local time of day", () => {
+    expect(getPersianGreeting(new Date(2026, 7, 15, 4, 59))).toBe("نیمه‌شبت بخیر");
+    expect(getPersianGreeting(new Date(2026, 7, 15, 8, 0))).toBe("صبحت بخیر");
+    expect(getPersianGreeting(new Date(2026, 7, 15, 13, 0))).toBe("ظهرت بخیر");
+    expect(getPersianGreeting(new Date(2026, 7, 15, 18, 0))).toBe("عصرت بخیر");
+    expect(getPersianGreeting(new Date(2026, 7, 15, 22, 0))).toBe("شبت بخیر");
   });
 });

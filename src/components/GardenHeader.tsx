@@ -6,6 +6,7 @@ import { ApricityAvatar } from "./ApricityAvatar";
 
 interface GardenHeaderProps {
   displayName: string;
+  greeting: string;
   nickname: string;
   avatarSeed: string;
   avatarVariant: AvatarVariant;
@@ -21,6 +22,7 @@ interface GardenHeaderProps {
 
 export function GardenHeader({
   displayName,
+  greeting,
   nickname,
   avatarSeed,
   avatarVariant,
@@ -37,10 +39,10 @@ export function GardenHeader({
     <header className="garden-header">
       <div className="garden-header__main">
         <div className="brand-mark brand-mark--avatar">
-          <ApricityAvatar seed={avatarSeed} variant={avatarVariant} palette={palette} stage={plantStage} size={54} label="آواتار امروز فاطمه" />
+          <ApricityAvatar seed={avatarSeed} variant={avatarVariant} palette={palette} stage={plantStage} size={54} label={`آواتار امروز ${displayName}`} />
         </div>
         <div>
-          <p className="eyebrow">سلام، {displayName} <Heart className="inline-heart" size={14} fill="currentColor" /></p>
+          <p className="eyebrow">سلام، {greeting} {displayName} <Heart className="inline-heart" size={14} fill="currentColor" /></p>
           <h1>{nickname}</h1>
           <p className="header-subtitle">گرمای آفتاب در روزهای سرد.</p>
           <div className="today-summary" aria-label={`امروز ${todayWeekday}، ${todayDate}`}>

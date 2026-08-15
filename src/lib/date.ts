@@ -7,6 +7,15 @@ export function getDayKey(date = new Date()): string {
   return `${year}-${month}-${day}`;
 }
 
+export function getPersianGreeting(date = new Date()): string {
+  const hour = date.getHours();
+  if (hour < 5) return "نیمه‌شبت بخیر";
+  if (hour < 12) return "صبحت بخیر";
+  if (hour < 17) return "ظهرت بخیر";
+  if (hour < 21) return "عصرت بخیر";
+  return "شبت بخیر";
+}
+
 export interface PersianDateSummary {
   weekday: string;
   date: string;
