@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { getDailyAvatar } from "./lib/avatar";
 import { getDayKey, getPersianDateSummary } from "./lib/date";
 import { toPersianDigits } from "./lib/format";
@@ -22,16 +22,17 @@ import type { EnergyLevel, FlowStep, GameState, Profile, QuestId, TaskDefinition
 import { EnergyPicker } from "./components/EnergyPicker";
 import { GardenHeader } from "./components/GardenHeader";
 import { GrowthScene } from "./components/GrowthScene";
-import { GuideDrawer } from "./components/GuideDrawer";
 import { InstallPrompt } from "./components/InstallPrompt";
 import { QuestGrid } from "./components/QuestGrid";
 import { RewardBanner } from "./components/RewardBanner";
-import { SettingsDrawer } from "./components/SettingsDrawer";
-import { TaskManagerDrawer } from "./components/TaskManagerDrawer";
 import { WeekMemory } from "./components/WeekMemory";
 import { useBodyScrollLock } from "./hooks/useBodyScrollLock";
 import { useInstallPrompt } from "./hooks/useInstallPrompt";
 import "./styles.css";
+
+const GuideDrawer = lazy(() => import("./components/GuideDrawer").then(({ GuideDrawer: Component }) => ({ default: Component })));
+const SettingsDrawer = lazy(() => import("./components/SettingsDrawer").then(({ SettingsDrawer: Component }) => ({ default: Component })));
+const TaskManagerDrawer = lazy(() => import("./components/TaskManagerDrawer").then(({ TaskManagerDrawer: Component }) => ({ default: Component })));
 
 interface ToastAction {
   label: string;
@@ -277,23 +278,29 @@ export default function App() {
         />
       )}
 
-      <GuideDrawer open={guideOpen} onClose={handleGuideClose} />
-      <SettingsDrawer
-        open={settingsOpen}
-        profile={gameState.profile}
-        rewards={gameState.rewards}
-        onClose={() => setSettingsOpen(false)}
-        onSave={handleProfileSave}
-        onAddReward={handleAddReward}
-        onRemoveReward={handleRemoveReward}
-      />
-      <TaskManagerDrawer
-        open={taskManagerOpen}
-        tasks={gameState.tasks}
-        onClose={() => setTaskManagerOpen(false)}
-        onAdd={handleAddTask}
-        onRemove={handleRemoveTask}
-      />
+      <Suspense fallback={null}>
+        {guideOpen && <GuideDrawer open onClose={handleGuideClose} />}
+        {settingsOpen && (
+          <SettingsDrawer
+            open
+            profile={gameState.profile}
+            rewards={gameState.rewards}
+            onClose={() => setSettingsOpen(false)}
+            onSave={handleProfileSave}
+            onAddReward={handleAddReward}
+            onRemoveReward={handleRemoveReward}
+          />
+        )}
+        {taskManagerOpen && (
+          <TaskManagerDrawer
+            open
+            tasks={gameState.tasks}
+            onClose={() => setTaskManagerOpen(false)}
+            onAdd={handleAddTask}
+            onRemove={handleRemoveTask}
+          />
+        )}
+      </Suspense>
 
       {toast && (
         <div className="toast" role="status">
