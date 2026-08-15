@@ -24,7 +24,7 @@ export const GARDEN_SLOT_COUNTS = [
 ] as const;
 
 export const GARDEN_SEED_UNLOCKS: Record<Exclude<GardenSeedKind, "tree">, number> = {
-  flower: 1,
+  flower: 0,
   bush: 3,
 };
 

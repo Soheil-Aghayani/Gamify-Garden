@@ -10,7 +10,7 @@ export interface GardenSeedDefinition {
 
 export const GARDEN_SEEDS: readonly GardenSeedDefinition[] = [
   { kind: "tree", label: "درخت امروز", copy: "جایزه‌ی سه قدم قشنگ", emoji: "🌳", color: "mint" },
-  { kind: "flower", label: "دانه‌ی گل", copy: "بعد از اولین برد آزاد می‌شود", emoji: "🌼", color: "peach" },
+  { kind: "flower", label: "گل شروع", copy: "یک دانه‌ی کوچولو برای شروع باغ", emoji: "🌼", color: "peach" },
   { kind: "bush", label: "دانه‌ی بوته", copy: "بعد از سه برد آزاد می‌شود", emoji: "🌿", color: "lilac" },
 ];
 

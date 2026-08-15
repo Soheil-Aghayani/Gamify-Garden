@@ -435,10 +435,18 @@ input:focus-visible {
 }
 
 .garden-header {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
+  padding: 0.75rem 0.85rem;
+  background: color-mix(in srgb, var(--surface-solid) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--line));
+  border-radius: 1.45rem;
+  box-shadow: 0 0.75rem 2rem color-mix(in srgb, var(--ink-strong) 7%, transparent);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
   margin-bottom: 1.4rem;
 }
 
@@ -457,7 +465,34 @@ input:focus-visible {
 }
 
 .garden-header__main {
+  min-width: 0;
+  flex: 1 1 auto;
   gap: 0.85rem;
+}
+
+.garden-header__copy {
+  min-width: 0;
+}
+
+.garden-header__name-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.32rem;
+}
+
+.garden-header__name-row h1 {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.garden-header__name-spark {
+  flex: 0 0 auto;
+  color: var(--warm-ink);
+  font-size: 0.75rem;
+  transform: translateY(-0.3rem);
 }
 
 .garden-header__side {
@@ -580,11 +615,17 @@ input:focus-visible {
 
 .header-subtitle {
   margin: 0.35rem 0 0;
+  max-width: 18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .today-summary {
   display: inline-flex;
   align-items: center;
+  max-width: 100%;
+  min-width: 0;
   gap: 0.45rem;
   margin-top: 0.65rem;
   padding: 0.35rem 0.55rem;
@@ -4075,29 +4116,61 @@ input:focus-visible {
   }
 
   .garden-header {
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.65rem 0.7rem;
     margin-bottom: 1rem;
   }
 
+  .garden-header__main {
+    gap: 0.55rem;
+  }
+
+  .garden-header__side {
+    flex: 0 0 auto;
+    gap: 0.3rem;
+  }
+
   .brand-mark {
-    width: 3rem;
-    height: 3rem;
+    width: 2.85rem;
+    height: 2.85rem;
   }
 
   .brand-mark--avatar .apricity-avatar svg {
-    width: 2.65rem;
-    height: 2.65rem;
+    width: 2.45rem;
+    height: 2.45rem;
   }
 
   .garden-header h1 {
-    font-size: 1.25rem;
+    font-size: 1.22rem;
+  }
+
+  .garden-header__name-spark {
+    font-size: 0.62rem;
+  }
+
+  .garden-header .eyebrow {
+    overflow: hidden;
+    font-size: 0.64rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .header-subtitle {
+    max-width: 13rem;
     font-size: 0.72rem;
   }
 
   .today-summary {
     margin-top: 0.5rem;
+    padding: 0.28rem 0.42rem;
+    border-radius: 0.72rem;
+  }
+
+  .today-summary__icon {
+    width: 1.35rem;
+    height: 1.35rem;
+    font-size: 0.86rem;
   }
 
   .energy-card,

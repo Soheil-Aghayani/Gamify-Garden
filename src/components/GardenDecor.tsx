@@ -105,6 +105,13 @@ export function GardenDecor({
     const unlocked = isGardenSeedUnlocked(seed.kind, lifetimeWins, pendingTreeCount);
     const selected = plantingKind === seed.kind;
     const isTreePending = seed.kind === "tree" && pendingTreeCount > 0;
+    const hint = isTreePending
+      ? `${toPersianDigits(pendingTreeCount)} دانه`
+      : seed.kind === "flower" && lifetimeWins === 0
+        ? "دانه‌ی شروع"
+        : unlocked
+          ? "آزاد است"
+          : seed.copy;
     return (
       <button
         key={seed.kind}
@@ -118,7 +125,7 @@ export function GardenDecor({
         <span className="garden-seed-option__emoji" aria-hidden="true">{unlocked ? seed.emoji : <Lock size={16} />}</span>
         <span className="garden-seed-option__copy">
           <strong>{seed.label}</strong>
-          <small>{isTreePending ? `${toPersianDigits(pendingTreeCount)} دانه` : unlocked ? "آزاد است" : seed.copy}</small>
+          <small>{hint}</small>
         </span>
       </button>
     );

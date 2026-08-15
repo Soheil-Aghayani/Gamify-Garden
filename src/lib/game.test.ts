@@ -224,15 +224,14 @@ describe("Gamify Garden game rules", () => {
     expect(state.plantedItems).toHaveLength(1);
   });
 
-  it("unlocks flower and bush seeds and protects garden slots", () => {
+  it("offers a starter flower, unlocks the bush seed, and protects garden slots", () => {
     let state = freshState();
-    expect(plantGardenItem(state, "flower", "plot-1").blocked).toBe(true);
+    const starterFlower = plantGardenItem(state, "flower", "plot-1");
+    expect(starterFlower.blocked).toBe(false);
+    state = starterFlower.state;
     expect(plantGardenItem(state, "tree", "plot-7").blocked).toBe(true);
 
     state = { ...state, lifetimeWins: 3 };
-    const flower = plantGardenItem(state, "flower", "plot-1");
-    expect(flower.blocked).toBe(false);
-    state = flower.state;
     expect(plantGardenItem(state, "bush", "plot-2").blocked).toBe(false);
     expect(plantGardenItem(state, "flower", "plot-1").blocked).toBe(true);
   });
