@@ -1,4 +1,6 @@
 <div dir="rtl" align="center">
+  <img src="public/readme-hero.svg" alt="تصویر قهرمان باغ Apricity" width="100%">
+
   <img src="public/icon.svg" width="112" alt="آیکون باغ Apricity">
 
   <h1>🌤️ Apricity · Gamify Garden</h1>
