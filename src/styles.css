@@ -20,6 +20,7 @@ html {
   min-height: 100%;
   background: #fff8f0;
   overscroll-behavior: none;
+  overflow-x: hidden;
 }
 
 html[data-theme="dark"],
@@ -36,6 +37,7 @@ body {
   min-width: 320px;
   min-height: 100dvh;
   overscroll-behavior-y: none;
+  overflow-x: hidden;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
@@ -440,7 +442,7 @@ input:focus-visible {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.75rem 0.85rem;
+  padding: 0.82rem 0.9rem 0.88rem;
   background: color-mix(in srgb, var(--surface-solid) 78%, transparent);
   border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--line));
   border-radius: 1.45rem;
@@ -472,6 +474,24 @@ input:focus-visible {
 
 .garden-header__copy {
   min-width: 0;
+  padding-top: 0.05rem;
+}
+
+.garden-header__brand-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  margin: 0 0 0.08rem;
+  color: var(--muted);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+}
+
+.garden-header__brand-kicker span:last-child {
+  color: var(--warm-ink);
+  font-size: 0.7rem;
+  line-height: 1;
 }
 
 .garden-header__name-row {
@@ -484,13 +504,19 @@ input:focus-visible {
 .garden-header__name-row h1 {
   min-width: 0;
   overflow: hidden;
+  color: var(--ink-strong);
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-family: Georgia, "Times New Roman", "Vazirmatn Variable", serif;
+  font-size: clamp(1.45rem, 4vw, 1.9rem);
+  font-weight: 750;
+  letter-spacing: 0.012em;
+  line-height: 1.08;
 }
 
 .garden-header__name-spark {
   flex: 0 0 auto;
-  color: var(--warm-ink);
+  color: var(--sun-ink);
   font-size: 0.75rem;
   transform: translateY(-0.3rem);
 }
@@ -614,11 +640,28 @@ input:focus-visible {
 }
 
 .header-subtitle {
-  margin: 0.35rem 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  margin: 0.2rem 0 0;
   max-width: 18rem;
   overflow: hidden;
+  color: var(--primary-deep);
+  font-weight: 650;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.header-subtitle__sun {
+  display: inline-grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: 0 0 auto;
+  color: var(--sun-ink);
+  background: color-mix(in srgb, var(--sun) 62%, transparent);
+  border-radius: 0.42rem;
+  font-size: 0.78rem;
 }
 
 .today-summary {
@@ -644,6 +687,10 @@ input:focus-visible {
   background: var(--sun);
   border-radius: 0.55rem;
   font-size: 1rem;
+}
+
+.today-summary__icon svg {
+  display: block;
 }
 
 .today-summary > span:last-child {
@@ -2239,6 +2286,16 @@ input:focus-visible {
 
 /* A calmer second pass for the farm map: fewer overlaps, clearer zones, and a stronger top-down composition. */
 .pixel-garden-map--cozy {
+  --pixel-grass: #84c88e;
+  --pixel-grass-dark: #4f916b;
+  --pixel-grass-light: #b9e3ad;
+  --pixel-soil: #b88f69;
+  --pixel-soil-dark: #805e51;
+  --pixel-soil-light: #e0c39c;
+  --pixel-path: #e1c79d;
+  --pixel-wood: #9d6c55;
+  --pixel-wood-light: #d7a27b;
+  --pixel-roof: #b86f67;
   aspect-ratio: 16 / 10;
   min-height: 0;
   border: 0.18rem solid color-mix(in srgb, var(--pixel-grass-dark) 72%, #f3d98e);
@@ -2246,6 +2303,92 @@ input:focus-visible {
   background: var(--pixel-grass);
   box-shadow: inset 0 0 0 0.22rem rgba(239, 220, 151, 0.18), 0 0.8rem 1.5rem rgba(66, 61, 49, 0.16);
   image-rendering: auto;
+}
+
+.pixel-garden-map--cozy .pixel-garden-map__image {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.pixel-garden-map--cozy .pixel-garden-map__decor-layer {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pixel-garden-map--cozy .pixel-garden-map__decor {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  filter: drop-shadow(0 0.28rem 0.2rem rgba(63, 67, 48, 0.2));
+  transform-origin: center bottom;
+  animation: garden-decor-float 3.4s ease-in-out infinite;
+}
+
+.pixel-garden-map--cozy .pixel-garden-map__decor img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.pixel-garden-map--cozy .pixel-garden-map__decor-sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: var(--decor-sprite);
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-size: 600% 100%;
+  user-select: none;
+}
+
+.pixel-garden-map--cozy .pixel-garden-map__decor--flower {
+  width: 7%;
+  height: 13%;
+  inset: 58% auto auto 10%;
+}
+
+.pixel-garden-map--cozy .pixel-garden-map__decor--butterfly {
+  width: clamp(2.2rem, 8%, 4.8rem);
+  height: auto;
+  aspect-ratio: 1;
+  inset: 19% 6% auto auto;
+  animation: garden-butterfly-drift 7s ease-in-out infinite;
+}
+
+.pixel-garden-map--cozy .pixel-garden-map__decor--butterfly .pixel-garden-map__decor-sprite {
+  animation: butterfly-flap 1.15s steps(6, end) infinite;
+}
+
+.pixel-garden-map--cozy .pixel-garden-map__decor--bench {
+  inset: 29% 14% auto auto;
+  font-size: clamp(1.1rem, 4vw, 2rem);
+  animation-delay: 120ms;
+}
+
+.pixel-garden-map--cozy .pixel-garden-map__decor--lamp {
+  inset: 39% 8% auto auto;
+  font-size: clamp(1rem, 3.2vw, 1.6rem);
+  animation-delay: 220ms;
+}
+
+.pixel-garden-map--cozy .pixel-garden-map__decor--cat {
+  inset: 65% 9% auto auto;
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  animation-delay: 320ms;
 }
 
 .pixel-garden-map--cozy .pixel-garden-map__grass {
@@ -2311,12 +2454,12 @@ input:focus-visible {
   width: 84%;
   height: 59%;
   inset: 35% 8% auto auto;
-  background-color: #c07838;
+  background-color: #d7a675;
   background-image:
-    repeating-linear-gradient(90deg, rgba(100, 53, 38, 0.22) 0 0.11rem, transparent 0.11rem 0.66rem),
-    linear-gradient(0deg, #db974d 0 0.14rem, transparent 0.14rem 0.62rem);
-  border-color: #713a2b;
-  box-shadow: inset 0 0.16rem 0 #e8ad62;
+    repeating-linear-gradient(90deg, rgba(117, 71, 58, 0.2) 0 0.11rem, transparent 0.11rem 0.66rem),
+    linear-gradient(0deg, #e4bc8c 0 0.14rem, transparent 0.14rem 0.62rem);
+  border-color: #805044;
+  box-shadow: inset 0 0.16rem 0 #f0c99b;
 }
 
 .pixel-garden-map--cozy .pixel-house__door {
@@ -2414,9 +2557,9 @@ input:focus-visible {
 }
 
 .pixel-garden-map--cozy .pixel-soil-patch--main {
-  width: 49%;
-  height: 37%;
-  inset: 58% auto auto 27%;
+  width: 58%;
+  height: 48%;
+  inset: 50% auto auto 21%;
 }
 
 .pixel-garden-map--cozy .pixel-soil-patch--left {
@@ -2455,37 +2598,52 @@ input:focus-visible {
 .pixel-garden-map--cozy .pixel-flower-cluster--two { inset: auto 23% 7% auto; }
 
 .pixel-garden-map--cozy .pixel-garden-map__plot-field {
-  width: 44%;
-  height: 34%;
-  inset: 59% auto auto 29%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  column-gap: 1.8%;
+  row-gap: 3.2%;
+  width: 58%;
+  height: 46%;
+  inset: 35% auto auto 21%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .pixel-garden-map--cozy .pixel-garden-plot {
-  width: 14%;
-  height: 33%;
-  color: color-mix(in srgb, var(--pixel-soil-light) 84%, white);
-  background: rgba(111, 69, 39, 0.24);
-  border: 0.1rem dashed rgba(241, 196, 104, 0.48);
-  border-radius: 0.18rem;
-  box-shadow: inset 0 0 0 1px rgba(91, 53, 37, 0.16);
+  position: relative;
+  inset: auto;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  color: rgba(255, 240, 190, 0.8);
+  background: transparent;
+  border: 0.1rem solid transparent;
+  border-radius: 0.72rem;
+  box-shadow: none;
+  transform: none;
 }
 
 .pixel-garden-map--cozy .pixel-garden-plot:hover:not(:disabled) {
-  transform: translate(-50%, -50%) scale(1.06);
+  transform: scale(1.06);
 }
 
 .pixel-garden-map--cozy .pixel-garden-plot.is-empty {
-  background: rgba(106, 64, 38, 0.28);
+  background: transparent;
 }
 
 .pixel-garden-map--cozy .pixel-garden-plot.is-occupied {
-  background: rgba(217, 154, 76, 0.34);
+  background: rgba(255, 235, 170, 0.1);
   border-style: solid;
-  border-color: rgba(255, 225, 141, 0.72);
+  border-color: rgba(255, 235, 170, 0.26);
 }
 
 .pixel-garden-map--cozy .pixel-garden-plot.is-target {
-  background: #7cae57;
+  background: #72b47b;
   border: 0.12rem solid #ffec9b;
   box-shadow: 0 0 0 0.13rem rgba(255, 239, 164, 0.5), 0 0.18rem 0 #467640;
   animation: cozy-plot-pulse 1.35s steps(2, end) infinite;
@@ -2499,6 +2657,13 @@ input:focus-visible {
   background: rgba(66, 104, 56, 0.78);
   border-color: #f8df8b;
   font-size: 0.46rem;
+}
+
+.pixel-garden-map--cozy .pixel-plant {
+  width: min(74%, 4.35rem);
+  height: min(78%, 4.35rem);
+  object-fit: contain;
+  filter: drop-shadow(0 0.22rem 0.16rem rgba(53, 60, 45, 0.26));
 }
 
 .pixel-garden-map--cozy .pixel-garden-map__caption {
@@ -2706,6 +2871,98 @@ input:focus-visible {
   gap: 0.45rem;
 }
 
+.garden-tree-variants {
+  display: grid;
+  gap: 0.4rem;
+  padding-top: 0.15rem;
+  border-top: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.garden-tree-variants__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.garden-tree-variants__heading strong {
+  color: var(--ink-strong);
+  font-size: 0.64rem;
+}
+
+.garden-tree-variants__heading small {
+  color: var(--muted);
+  font-size: 0.52rem;
+}
+
+.garden-tree-variants__options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.garden-tree-variant {
+  display: grid;
+  justify-items: center;
+  min-width: 0;
+  gap: 0.2rem;
+  padding: 0.32rem 0.2rem;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface-solid) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--muted) 13%, transparent);
+  border-radius: 0.72rem;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.garden-tree-variant:hover {
+  transform: translateY(-0.1rem);
+}
+
+.garden-tree-variant.is-selected {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary-soft) 72%, var(--surface-solid));
+  box-shadow: 0 0 0 0.15rem color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.garden-tree-variant__art {
+  display: block;
+  width: 2.45rem;
+  height: 2.45rem;
+}
+
+.garden-tree-variant__art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.garden-tree-variant__copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.06rem;
+  text-align: center;
+}
+
+.garden-tree-variant__copy strong,
+.garden-tree-variant__copy small {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.garden-tree-variant__copy strong {
+  color: inherit;
+  font-size: 0.56rem;
+}
+
+.garden-tree-variant__copy small {
+  color: var(--warm-ink);
+  font-size: 0.45rem;
+}
+
 .garden-seed-option {
   display: flex;
   align-items: center;
@@ -2758,6 +3015,14 @@ input:focus-visible {
   font-size: 1.22rem;
   background: var(--primary-soft);
   border-radius: 0.65rem;
+}
+
+.garden-seed-option__emoji img,
+.decor-card__item-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .garden-seed-option--peach .garden-seed-option__emoji {
@@ -2834,6 +3099,7 @@ input:focus-visible {
   width: 100%;
   height: auto;
   overflow: visible;
+  object-fit: contain;
 }
 
 .garden-item-art__ground {
@@ -4037,6 +4303,23 @@ input:focus-visible {
   to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
 }
 
+@keyframes garden-decor-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-0.22rem) rotate(2deg); }
+}
+
+@keyframes butterfly-flap {
+  from { background-position: 0 0; }
+  to { background-position: 100% 0; }
+}
+
+@keyframes garden-butterfly-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-4deg); }
+  25% { transform: translate3d(-0.35rem, -0.28rem, 0) rotate(2deg); }
+  50% { transform: translate3d(-0.08rem, -0.58rem, 0) rotate(5deg); }
+  75% { transform: translate3d(0.3rem, -0.2rem, 0) rotate(-1deg); }
+}
+
 @keyframes garden-grow {
   from { opacity: 0; transform: translateX(50%) translateY(0.5rem) scale(0.82); }
   to { opacity: 1; transform: translateX(50%) translateY(0) scale(1); }
@@ -4349,7 +4632,7 @@ input:focus-visible {
   }
 
   .pixel-garden-map--cozy {
-    aspect-ratio: 1.28 / 1;
+    aspect-ratio: 16 / 10;
     min-height: 0;
     border-radius: 0.9rem;
   }
@@ -4368,9 +4651,12 @@ input:focus-visible {
   }
 
   .pixel-garden-map--cozy .pixel-garden-map__plot-field {
-    width: 55%;
-    height: 34%;
-    inset: 60% auto auto 22.5%;
+    width: 58%;
+    height: 46%;
+    inset: 35% auto auto 21%;
+    column-gap: 1.8%;
+    row-gap: 3.2%;
+    padding: 0;
   }
 
   .pixel-garden-map--cozy .pixel-house {
@@ -4385,13 +4671,19 @@ input:focus-visible {
   }
 
   .pixel-garden-map--cozy .pixel-garden-plot {
-    width: 15%;
-    height: 33%;
+    width: auto;
+    height: auto;
+  }
+
+  .pixel-garden-map--cozy .pixel-soil-patch--main {
+    width: 78%;
+    height: 54%;
+    inset: 34% auto auto 11%;
   }
 
   .pixel-garden-map--cozy .pixel-plant {
-    width: 2rem;
-    height: 2rem;
+    width: min(74%, 4.35rem);
+    height: min(78%, 4.35rem);
   }
 
   .garden-board {
@@ -4481,6 +4773,40 @@ input:focus-visible {
   }
 }
 
+@media (max-width: 360px) {
+  .pixel-garden-map--cozy .pixel-garden-map__plot-field {
+    width: 58%;
+    height: 46%;
+    inset: 35% auto auto 21%;
+    column-gap: 1.8%;
+    row-gap: 3.2%;
+    padding: 0;
+  }
+
+  .pixel-garden-map--cozy .pixel-soil-patch--main {
+    width: 82%;
+    height: 58%;
+    inset: 32% auto auto 9%;
+  }
+
+  .growth-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.55rem;
+  }
+
+  .growth-visual {
+    order: -1;
+  }
+
+  .growth-ring {
+    width: min(100%, 174px);
+  }
+
+  .growth-card__copy {
+    padding-top: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -4489,5 +4815,15 @@ input:focus-visible {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+
+  .pixel-garden-map--cozy .pixel-garden-map__decor--butterfly,
+  .pixel-garden-map--cozy .pixel-garden-map__decor--butterfly .pixel-garden-map__decor-sprite {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .pixel-garden-map--cozy .pixel-garden-map__decor--butterfly .pixel-garden-map__decor-sprite {
+    background-position: 0 0;
   }
 }

@@ -1,5 +1,6 @@
 import { DEFAULT_TASKS } from "../data/quests";
 import { DEFAULT_REWARDS, REWARD_CATALOG_VERSION } from "../data/rewards";
+import { isGardenTreeVariant } from "../data/garden";
 import { createInitialState, getUnlockedGardenSlotCount, recalculateStats } from "./game";
 import type { DailyState, GardenSeedKind, GameState, MoodLevel, PaletteId, PlantStage, PlantedGardenItem, QuestId, TaskDefinition, TaskIconKey, ThemeMode } from "../types/game";
 
@@ -128,6 +129,9 @@ function normalizePlantedItems(value: unknown, lifetimeWins: number): PlantedGar
     .map((item) => ({
       id: item.id!.trim().slice(0, 120),
       kind: item.kind as GardenSeedKind,
+      treeVariant: item.kind === "tree"
+        ? (isGardenTreeVariant(item.treeVariant) ? item.treeVariant : "peach")
+        : undefined,
       slotId: item.slotId!,
       plantedAt: typeof item.plantedAt === "number" && Number.isFinite(item.plantedAt) ? item.plantedAt : 0,
       sourceDayKey: typeof item.sourceDayKey === "string" ? item.sourceDayKey.slice(0, 20) : undefined,

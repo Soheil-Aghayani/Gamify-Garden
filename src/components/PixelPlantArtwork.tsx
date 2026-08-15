@@ -1,7 +1,10 @@
-import type { GardenSeedKind } from "../types/game";
+import { getTreeVariantDefinition } from "../data/garden";
+import { getGardenAssetPath } from "../lib/assets";
+import type { GardenSeedKind, GardenTreeVariant } from "../types/game";
 
 interface PixelPlantArtworkProps {
   kind: GardenSeedKind;
+  treeVariant?: GardenTreeVariant;
 }
 
 const LABELS: Record<GardenSeedKind, string> = {
@@ -10,18 +13,7 @@ const LABELS: Record<GardenSeedKind, string> = {
   bush: "بوته‌ی باغ",
 };
 
-export function PixelPlantArtwork({ kind }: PixelPlantArtworkProps) {
-  return (
-    <span className={`pixel-plant pixel-plant--${kind}`} role="img" aria-label={LABELS[kind]}>
-      <span className="pixel-plant__shadow" aria-hidden="true" />
-      <span className="pixel-plant__trunk" aria-hidden="true" />
-      <span className="pixel-plant__canopy pixel-plant__canopy--one" aria-hidden="true" />
-      <span className="pixel-plant__canopy pixel-plant__canopy--two" aria-hidden="true" />
-      <span className="pixel-plant__canopy pixel-plant__canopy--three" aria-hidden="true" />
-      <span className="pixel-plant__petal pixel-plant__petal--one" aria-hidden="true" />
-      <span className="pixel-plant__petal pixel-plant__petal--two" aria-hidden="true" />
-      <span className="pixel-plant__berry pixel-plant__berry--one" aria-hidden="true" />
-      <span className="pixel-plant__berry pixel-plant__berry--two" aria-hidden="true" />
-    </span>
-  );
+export function PixelPlantArtwork({ kind, treeVariant = "peach" }: PixelPlantArtworkProps) {
+  const label = kind === "tree" ? `درخت ${getTreeVariantDefinition(treeVariant).label}` : LABELS[kind];
+  return <img className={`pixel-plant pixel-plant--${kind}`} src={getGardenAssetPath(kind, treeVariant)} alt={label} draggable="false" />;
 }

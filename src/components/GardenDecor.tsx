@@ -1,15 +1,17 @@
 import { Lock, MapPin, Move, Sparkles, Trash2, X } from "lucide-react";
-import { useEffect, useState, type Ref } from "react";
-import { GARDEN_DECOR, getNextDecor } from "../data/decor";
-import { GARDEN_SEEDS, getSeedDefinition } from "../data/garden";
+import { useEffect, useRef, useState, type Ref } from "react";
+import { GARDEN_DECOR, getNextDecor, getUnlockedDecor } from "../data/decor";
+import { GARDEN_SEEDS, GARDEN_TREE_VARIANTS, getSeedDefinition, getTreeVariantDefinition } from "../data/garden";
 import {
   GARDEN_SLOT_COUNTS,
+  getDailyTreeSuggestion,
   getGardenSlotIds,
   getUnlockedGardenSlotCount,
   isGardenSeedUnlocked,
 } from "../lib/game";
 import { toPersianDigits } from "../lib/format";
-import type { GardenSeedKind, PlantedGardenItem } from "../types/game";
+import { getGardenAssetPath, getGardenDecorAssetPath, getGardenTreeAssetPath } from "../lib/assets";
+import type { GardenSeedKind, GardenTreeVariant, PlantedGardenItem } from "../types/game";
 import { PixelGardenMap } from "./PixelGardenMap";
 
 interface GardenDecorProps {
@@ -19,7 +21,7 @@ interface GardenDecorProps {
   deferredTreePlanting?: boolean;
   isNext: boolean;
   sectionRef?: Ref<HTMLElement>;
-  onPlant: (kind: GardenSeedKind, slotId: string, sourceDayKey?: string) => void;
+  onPlant: (kind: GardenSeedKind, slotId: string, sourceDayKey?: string, treeVariant?: GardenTreeVariant) => void;
   onDefer: () => void;
   onMove: (itemId: string, slotId: string) => void;
   onRemove: (itemId: string) => void;
@@ -38,23 +40,37 @@ export function GardenDecor({
   onRemove,
 }: GardenDecorProps) {
   const nextDecor = getNextDecor(lifetimeWins);
+  const unlockedDecor = getUnlockedDecor(lifetimeWins);
   const unlockedSlotCount = getUnlockedGardenSlotCount(lifetimeWins);
   const unlockedSlotIds = getGardenSlotIds(lifetimeWins);
   const pendingTreeCount = pendingTreeSeedDays.length;
   const hasPendingTree = pendingTreeCount > 0;
 
   const [plantingKind, setPlantingKind] = useState<GardenSeedKind | null>(null);
+  const [treeVariant, setTreeVariant] = useState<GardenTreeVariant>(() => getDailyTreeSuggestion(pendingTreeSeedDays[0]));
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [movingItemId, setMovingItemId] = useState<string | null>(null);
+  const treeSourceDayRef = useRef(pendingTreeSeedDays[0] ?? "");
 
   const selectedItem = plantedItems.find((item) => item.id === selectedItemId);
   const movingItem = plantedItems.find((item) => item.id === movingItemId);
+  const selectedItemLabel = selectedItem?.kind === "tree"
+    ? `درخت ${getTreeVariantDefinition(selectedItem.treeVariant ?? "peach").label}`
+    : selectedItem ? getSeedDefinition(selectedItem.kind).label : "آیتم باغ";
 
   useEffect(() => {
     if (selectedItemId && !plantedItems.some((item) => item.id === selectedItemId)) setSelectedItemId(null);
     if (movingItemId && !plantedItems.some((item) => item.id === movingItemId)) setMovingItemId(null);
     if (plantingKind === "tree" && pendingTreeCount === 0) setPlantingKind(null);
   }, [movingItemId, pendingTreeCount, plantedItems, plantingKind, selectedItemId]);
+
+  useEffect(() => {
+    const sourceDayKey = pendingTreeSeedDays[0] ?? "";
+    if (sourceDayKey !== treeSourceDayRef.current) {
+      treeSourceDayRef.current = sourceDayKey;
+      setTreeVariant(getDailyTreeSuggestion(sourceDayKey || undefined));
+    }
+  }, [pendingTreeSeedDays]);
 
   const chooseSeed = (kind: GardenSeedKind) => {
     if (!isGardenSeedUnlocked(kind, lifetimeWins, pendingTreeCount)) return;
@@ -83,7 +99,12 @@ export function GardenDecor({
 
     if (plantingKind) {
       if (!item) {
-        onPlant(plantingKind, slotId, plantingKind === "tree" ? pendingTreeSeedDays[0] : undefined);
+        onPlant(
+          plantingKind,
+          slotId,
+          plantingKind === "tree" ? pendingTreeSeedDays[0] : undefined,
+          plantingKind === "tree" ? treeVariant : undefined,
+        );
         setPlantingKind(null);
         return;
       }
@@ -122,7 +143,7 @@ export function GardenDecor({
         aria-pressed={selected}
         title={seed.copy}
       >
-        <span className="garden-seed-option__emoji" aria-hidden="true">{unlocked ? seed.emoji : <Lock size={16} />}</span>
+        <span className="garden-seed-option__emoji" aria-hidden="true">{unlocked ? <img src={getGardenAssetPath(seed.kind)} alt="" draggable="false" /> : <Lock size={16} />}</span>
         <span className="garden-seed-option__copy">
           <strong>{seed.label}</strong>
           <small>{hint}</small>
@@ -130,6 +151,40 @@ export function GardenDecor({
       </button>
     );
   });
+
+  const suggestedTreeVariant = getDailyTreeSuggestion(pendingTreeSeedDays[0]);
+  const treeVariantPicker = plantingKind === "tree" && hasPendingTree ? (
+    <div className="garden-tree-variants" aria-label="انتخاب نوع درخت">
+      <div className="garden-tree-variants__heading">
+        <strong>چه درختی بکاریم؟</strong>
+        <small>هر کدومش یک حال‌وهوای قشنگ دارد</small>
+      </div>
+      <div className="garden-tree-variants__options">
+        {GARDEN_TREE_VARIANTS.map((variant) => {
+          const selected = treeVariant === variant.id;
+          const suggested = suggestedTreeVariant === variant.id;
+          return (
+            <button
+              key={variant.id}
+              type="button"
+              className={`garden-tree-variant${selected ? " is-selected" : ""}`}
+              onClick={() => setTreeVariant(variant.id)}
+              aria-pressed={selected}
+              title={variant.copy}
+            >
+              <span className="garden-tree-variant__art" aria-hidden="true">
+                <img src={getGardenTreeAssetPath(variant.id)} alt="" draggable="false" />
+              </span>
+              <span className="garden-tree-variant__copy">
+                <strong>{variant.label}</strong>
+                {suggested && <small>پیشنهاد امروز ✨</small>}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  ) : null;
 
   return (
     <section
@@ -164,6 +219,7 @@ export function GardenDecor({
         <div className="garden-seed-tray garden-seed-tray--quick">
           {seedOptions}
         </div>
+        {treeVariantPicker}
       </div>
 
       <div className="garden-board" aria-label="باغ قابل کاشت">
@@ -201,13 +257,15 @@ export function GardenDecor({
           plantingKind={plantingKind}
           movingItemId={movingItemId}
           selectedItemId={selectedItemId}
+          unlockedDecor={unlockedDecor}
           pendingTreeReady={hasPendingTree}
+          pendingTreeVariant={treeVariant}
           onSlotClick={handleSlotClick}
         />
 
         {selectedItem && !movingItemId && (
-          <div className="garden-item-actions" role="group" aria-label={`مدیریت ${getSeedDefinition(selectedItem.kind).label}`}>
-            <span className="garden-item-actions__title">{getSeedDefinition(selectedItem.kind).emoji} {getSeedDefinition(selectedItem.kind).label}</span>
+          <div className="garden-item-actions" role="group" aria-label={`مدیریت ${selectedItemLabel}`}>
+            <span className="garden-item-actions__title">{getSeedDefinition(selectedItem.kind).emoji} {selectedItemLabel}</span>
             <button type="button" className="text-button" onClick={() => { setMovingItemId(selectedItem.id); setSelectedItemId(null); }}>
               <Move size={15} /> جابه‌جا کن
             </button>
@@ -235,7 +293,11 @@ export function GardenDecor({
           return (
             <div className={`decor-card__item${unlocked ? " is-unlocked" : ""}`} key={decor.id}>
               <span className="decor-card__item-icon" aria-hidden="true">
-                {unlocked ? decor.emoji : <Lock size={14} />}
+                {unlocked
+                  ? (getGardenDecorAssetPath(decor.id)
+                    ? <img src={getGardenDecorAssetPath(decor.id)} alt="" draggable="false" />
+                    : decor.emoji)
+                  : <Lock size={14} />}
               </span>
               <span>{decor.label}</span>
             </div>

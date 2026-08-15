@@ -1,5 +1,25 @@
-const CACHE_NAME = "apricity-shell-v8";
-const APP_SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./icon-192.svg", "./icon-512.svg"];
+const CACHE_NAME = "apricity-shell-v9";
+const APP_SHELL = [
+  "./",
+  "./index.html",
+  "./manifest.webmanifest",
+  "./icon.svg",
+  "./icon-192.svg",
+  "./icon-512.svg",
+  "./apricity-garden-map.webp",
+  "./apricity-tree.webp",
+  "./apricity-tree-peach.webp",
+  "./apricity-tree-apple.webp",
+  "./apricity-tree-cherry.webp",
+  "./apricity-tree-lemon.webp",
+  "./apricity-flower.webp",
+  "./apricity-bush.webp",
+  "./apricity-butterfly.webp",
+  "./apricity-butterfly-sprite.webp",
+  "./apricity-bench.webp",
+  "./apricity-lamp.webp",
+  "./apricity-cat.webp",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

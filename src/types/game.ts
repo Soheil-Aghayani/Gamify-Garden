@@ -4,6 +4,7 @@ export type EnergyLevel = 1 | 2 | 3;
 export type MoodLevel = "tired" | "calm" | "low" | "energized";
 export type PlantStage = "seed" | "sprout" | "flower" | "tree";
 export type GardenSeedKind = "tree" | "flower" | "bush";
+export type GardenTreeVariant = "peach" | "apple" | "cherry" | "lemon";
 export type PaletteId = "mint" | "lilac" | "peach";
 export type ThemeMode = "light" | "dark" | "system";
 export type FlowStep = "intro" | "energy" | "tasks" | "plant" | "reward" | "done" | "manage";
@@ -46,6 +47,7 @@ export interface DailyState {
 export interface PlantedGardenItem {
   id: string;
   kind: GardenSeedKind;
+  treeVariant?: GardenTreeVariant;
   slotId: string;
   plantedAt: number;
   sourceDayKey?: string;

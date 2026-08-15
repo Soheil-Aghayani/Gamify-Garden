@@ -4,6 +4,7 @@ import {
   addReward,
   createInitialState,
   getDailyPlantStage,
+  getDailyTreeSuggestion,
   getDailyTarget,
   getFlowStep,
   getPendingTreeSeeds,
@@ -163,6 +164,27 @@ describe("Gamify Garden game rules", () => {
 
     expect(state.rewards).toContain("چای و موسیقی");
     expect(state.rewards.filter((reward) => reward === "چای و موسیقی")).toHaveLength(1);
+  });
+
+  it("keeps the daily tree suggestion stable and stores a manual choice", () => {
+    expect(getDailyTreeSuggestion(DAY)).toBe(getDailyTreeSuggestion(DAY));
+    expect(["peach", "apple", "cherry", "lemon"]).toContain(getDailyTreeSuggestion(DAY));
+
+    const planted = plantGardenItem(freshState(), "flower", "plot-1");
+    expect(planted.blocked).toBe(false);
+
+    const treeState = { ...freshState(), days: {
+      [DAY]: {
+        dayKey: DAY,
+        energy: 2 as const,
+        energyConfirmed: true,
+        completedQuestIds: QUESTS.slice(0, 3),
+        dailyWin: true,
+      },
+    }};
+    const tree = plantGardenItem(treeState, "tree", "plot-1", DAY, "apple");
+    expect(tree.blocked).toBe(false);
+    expect(tree.item?.treeVariant).toBe("apple");
   });
 
   it("adapts task energy to the selected mood", () => {

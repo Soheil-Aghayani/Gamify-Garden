@@ -25,7 +25,7 @@ import {
   toggleQuest,
 } from "./lib/game";
 import { loadGameState, saveGameState } from "./lib/storage";
-import type { FlowStep, GardenSeedKind, GameState, MoodLevel, Profile, QuestId, TaskDefinition } from "./types/game";
+import type { FlowStep, GardenSeedKind, GardenTreeVariant, GameState, MoodLevel, Profile, QuestId, TaskDefinition } from "./types/game";
 import { EnergyPicker } from "./components/EnergyPicker";
 import { GardenHeader } from "./components/GardenHeader";
 import { GardenDecor } from "./components/GardenDecor";
@@ -199,8 +199,8 @@ export default function App() {
     setGameState(result.state);
   };
 
-  const handlePlant = (kind: GardenSeedKind, slotId: string, sourceDayKey?: string) => {
-    const result = plantGardenItem(gameState, kind, slotId, sourceDayKey);
+  const handlePlant = (kind: GardenSeedKind, slotId: string, sourceDayKey?: string, treeVariant?: GardenTreeVariant) => {
+    const result = plantGardenItem(gameState, kind, slotId, sourceDayKey, treeVariant);
     if (result.blocked) {
       showToast("این جایگاه برای کاشت آماده نیست؛ یکی از جای خالی‌ها را انتخاب کن 🌱");
       return;

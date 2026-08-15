@@ -1,11 +1,13 @@
 import { DEFAULT_TASKS } from "../data/quests";
 import { DEFAULT_REWARDS, REWARD_CATALOG_VERSION } from "../data/rewards";
+import { GARDEN_TREE_VARIANTS, isGardenTreeVariant } from "../data/garden";
 import { getDayKey, shiftDayKey } from "./date";
 import type {
   DailyState,
   EnergyLevel,
   FlowStep,
   GardenSeedKind,
+  GardenTreeVariant,
   GameState,
   MoodLevel,
   PlantStage,
@@ -156,6 +158,11 @@ export function getLongTermPlantStage(totalWins: number): PlantStage {
   if (totalWins >= 3) return "flower";
   if (totalWins >= 1) return "sprout";
   return "seed";
+}
+
+export function getDailyTreeSuggestion(dayKey = getDayKey()): GardenTreeVariant {
+  const variantIndex = hashValue(`tree:${dayKey}`) % GARDEN_TREE_VARIANTS.length;
+  return GARDEN_TREE_VARIANTS[variantIndex]?.id ?? "peach";
 }
 
 function isPlantStage(value: unknown): value is PlantStage {
@@ -364,6 +371,7 @@ export function plantGardenItem(
   kind: GardenSeedKind,
   slotId: string,
   sourceDayKey?: string,
+  treeVariant?: GardenTreeVariant,
 ): GardenMutationResult {
   const pendingTreeSeeds = getPendingTreeSeeds(state);
   if (!isValidGardenSeedKind(kind)
@@ -378,9 +386,16 @@ export function plantGardenItem(
     : sourceDayKey;
   if (kind === "tree" && !resolvedSourceDayKey) return { state, blocked: true };
 
+  const resolvedTreeVariant = kind === "tree"
+    ? (isGardenTreeVariant(treeVariant)
+      ? treeVariant
+      : getDailyTreeSuggestion(resolvedSourceDayKey))
+    : undefined;
+
   const item: PlantedGardenItem = {
     id: makeGardenItemId(kind, slotId),
     kind,
+    treeVariant: resolvedTreeVariant,
     slotId,
     plantedAt: Date.now(),
     sourceDayKey: resolvedSourceDayKey,
