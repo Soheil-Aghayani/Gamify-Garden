@@ -632,36 +632,10 @@ input:focus-visible {
   letter-spacing: 0.02em;
 }
 
-.header-subtitle,
 .growth-card__copy p,
 .reward-card__content p {
   color: var(--muted);
   font-size: 0.82rem;
-}
-
-.header-subtitle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.28rem;
-  margin: 0.2rem 0 0;
-  max-width: 18rem;
-  overflow: hidden;
-  color: var(--primary-deep);
-  font-weight: 650;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.header-subtitle__sun {
-  display: inline-grid;
-  place-items: center;
-  width: 1.15rem;
-  height: 1.15rem;
-  flex: 0 0 auto;
-  color: var(--sun-ink);
-  background: color-mix(in srgb, var(--sun) 62%, transparent);
-  border-radius: 0.42rem;
-  font-size: 0.78rem;
 }
 
 .today-summary {
@@ -4437,11 +4411,6 @@ input:focus-visible {
     font-size: 0.64rem;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .header-subtitle {
-    max-width: 13rem;
-    font-size: 0.72rem;
   }
 
   .today-summary {

@@ -51,7 +51,6 @@ export function GardenHeader({
             <h1 dir="auto">{nickname}</h1>
             <span className="garden-header__name-spark" aria-hidden="true">✦</span>
           </div>
-          <p className="header-subtitle">یک قدم کوچیک هم برای امروز کافیه.</p>
           <div className="today-summary" aria-label={`امروز ${todayWeekday}، ${todayDate}`}>
             <span className="today-summary__icon" aria-hidden="true"><CalendarDays size={15} strokeWidth={1.8} /></span>
             <span>
