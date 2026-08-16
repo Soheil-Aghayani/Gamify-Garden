@@ -3,9 +3,11 @@ export type QuestId = string;
 export type EnergyLevel = 1 | 2 | 3;
 export type MoodLevel = "tired" | "calm" | "low" | "energized";
 export type PlantStage = "seed" | "sprout" | "flower" | "tree";
+export type GardenSeedKind = "tree" | "flower" | "bush";
+export type GardenTreeVariant = "peach" | "apple" | "cherry" | "lemon";
 export type PaletteId = "mint" | "lilac" | "peach";
 export type ThemeMode = "light" | "dark" | "system";
-export type FlowStep = "intro" | "energy" | "tasks" | "reward" | "done" | "manage";
+export type FlowStep = "intro" | "energy" | "tasks" | "plant" | "reward" | "done" | "manage";
 export type TaskIconKey =
   | "brain"
   | "play"
@@ -38,7 +40,17 @@ export interface DailyState {
   energyConfirmed: boolean;
   completedQuestIds: QuestId[];
   dailyWin: boolean;
+  treeSeedClaimed?: boolean;
   rewardChoice?: string;
+}
+
+export interface PlantedGardenItem {
+  id: string;
+  kind: GardenSeedKind;
+  treeVariant?: GardenTreeVariant;
+  slotId: string;
+  plantedAt: number;
+  sourceDayKey?: string;
 }
 
 export interface Profile {
@@ -58,6 +70,7 @@ export interface GameState {
   gentleStreak: number;
   plantStage: PlantStage;
   gardenPlantStage: PlantStage;
+  plantedItems: PlantedGardenItem[];
   hasSeenIntro: boolean;
   rewards: string[];
   rewardCatalogVersion: number;

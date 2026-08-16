@@ -1,7 +1,8 @@
 import { DEFAULT_TASKS } from "../data/quests";
 import { DEFAULT_REWARDS, REWARD_CATALOG_VERSION } from "../data/rewards";
-import { createInitialState, recalculateStats } from "./game";
-import type { DailyState, GameState, MoodLevel, PaletteId, PlantStage, QuestId, TaskDefinition, TaskIconKey, ThemeMode } from "../types/game";
+import { isGardenTreeVariant } from "../data/garden";
+import { createInitialState, getUnlockedGardenSlotCount, recalculateStats } from "./game";
+import type { DailyState, GardenSeedKind, GameState, MoodLevel, PaletteId, PlantStage, PlantedGardenItem, QuestId, TaskDefinition, TaskIconKey, ThemeMode } from "../types/game";
 
 export const STORAGE_KEY = "gamify-garden:v1";
 
@@ -37,6 +38,14 @@ function isMoodLevel(value: unknown): value is MoodLevel {
 
 function isPlantStage(value: unknown): value is PlantStage {
   return value === "seed" || value === "sprout" || value === "flower" || value === "tree";
+}
+
+function isGardenSeedKind(value: unknown): value is GardenSeedKind {
+  return value === "tree" || value === "flower" || value === "bush";
+}
+
+function isGardenSlotId(value: unknown): value is string {
+  return typeof value === "string" && /^plot-(?:[1-9]|1[0-2])$/.test(value);
 }
 
 function isTaskIconKey(value: unknown): value is TaskIconKey {
@@ -94,8 +103,39 @@ function normalizeDay(dayKey: string, value: unknown, tasks: TaskDefinition[]): 
     energyConfirmed: typeof candidate.energyConfirmed === "boolean" ? candidate.energyConfirmed : true,
     completedQuestIds,
     dailyWin,
+    treeSeedClaimed: typeof candidate.treeSeedClaimed === "boolean" ? candidate.treeSeedClaimed : false,
     rewardChoice: dailyWin && typeof candidate.rewardChoice === "string" ? candidate.rewardChoice.slice(0, 80) : undefined,
   };
+}
+
+function normalizePlantedItems(value: unknown, lifetimeWins: number): PlantedGardenItem[] {
+  if (!Array.isArray(value)) return [];
+  const availableSlots = getUnlockedGardenSlotCount(lifetimeWins);
+  const seenIds = new Set<string>();
+  const seenSlots = new Set<string>();
+  return value
+    .filter((item): item is Partial<PlantedGardenItem> => Boolean(item) && typeof item === "object")
+    .filter((item) => isGardenSeedKind(item.kind) && typeof item.id === "string" && item.id.trim() && isGardenSlotId(item.slotId))
+    .filter((item) => Number(item.slotId?.replace("plot-", "")) <= availableSlots)
+    .filter((item) => {
+      const id = item.id!.trim().slice(0, 120);
+      const slotId = item.slotId!;
+      if (seenIds.has(id) || seenSlots.has(slotId)) return false;
+      seenIds.add(id);
+      seenSlots.add(slotId);
+      return true;
+    })
+    .slice(0, availableSlots)
+    .map((item) => ({
+      id: item.id!.trim().slice(0, 120),
+      kind: item.kind as GardenSeedKind,
+      treeVariant: item.kind === "tree"
+        ? (isGardenTreeVariant(item.treeVariant) ? item.treeVariant : "peach")
+        : undefined,
+      slotId: item.slotId!,
+      plantedAt: typeof item.plantedAt === "number" && Number.isFinite(item.plantedAt) ? item.plantedAt : 0,
+      sourceDayKey: typeof item.sourceDayKey === "string" ? item.sourceDayKey.slice(0, 20) : undefined,
+    }));
 }
 
 function normalizeState(value: unknown): GameState {
@@ -150,6 +190,7 @@ function normalizeState(value: unknown): GameState {
     : typeof candidate.totalWins === "number" && Number.isFinite(candidate.totalWins)
       ? Math.max(0, Math.floor(candidate.totalWins))
       : 0;
+  const plantedItems = normalizePlantedItems(candidate.plantedItems, savedLifetimeWins);
   const savedGardenPlantStage = isPlantStage(candidate.gardenPlantStage)
     ? candidate.gardenPlantStage
     : Object.values(days).some((day) => day.dailyWin)
@@ -172,6 +213,7 @@ function normalizeState(value: unknown): GameState {
     days,
     lifetimeWins: savedLifetimeWins,
     gardenPlantStage: savedGardenPlantStage,
+    plantedItems,
     hasSeenIntro: typeof candidate.hasSeenIntro === "boolean" ? candidate.hasSeenIntro : true,
     rewards: rewards.length > 0 ? rewards : [...DEFAULT_REWARDS],
     rewardCatalogVersion: REWARD_CATALOG_VERSION,

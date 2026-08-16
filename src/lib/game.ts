@@ -1,19 +1,34 @@
 import { DEFAULT_TASKS } from "../data/quests";
 import { DEFAULT_REWARDS, REWARD_CATALOG_VERSION } from "../data/rewards";
+import { GARDEN_TREE_VARIANTS, isGardenTreeVariant } from "../data/garden";
 import { getDayKey, shiftDayKey } from "./date";
 import type {
   DailyState,
   EnergyLevel,
   FlowStep,
+  GardenSeedKind,
+  GardenTreeVariant,
   GameState,
   MoodLevel,
   PlantStage,
+  PlantedGardenItem,
   Profile,
   QuestId,
   TaskDefinition,
 } from "../types/game";
 
 export const DAILY_TARGET = 3;
+export const GARDEN_SLOT_COUNTS = [
+  { unlockAt: 0, count: 6 },
+  { unlockAt: 3, count: 8 },
+  { unlockAt: 6, count: 10 },
+  { unlockAt: 10, count: 12 },
+] as const;
+
+export const GARDEN_SEED_UNLOCKS: Record<Exclude<GardenSeedKind, "tree">, number> = {
+  flower: 0,
+  bush: 3,
+};
 
 export const MOOD_TO_ENERGY: Record<MoodLevel, EnergyLevel> = {
   tired: 1,
@@ -50,6 +65,7 @@ export function createInitialState(): GameState {
     gentleStreak: 0,
     plantStage: "seed",
     gardenPlantStage: "seed",
+    plantedItems: [],
     hasSeenIntro: false,
     rewards: [...DEFAULT_REWARDS],
     rewardCatalogVersion: REWARD_CATALOG_VERSION,
@@ -63,6 +79,29 @@ export function getDayState(state: GameState, dayKey = getDayKey()): DailyState 
 
 export function getDailyTarget(state: GameState): number {
   return Math.min(DAILY_TARGET, state.tasks.length);
+}
+
+export function getUnlockedGardenSlotCount(lifetimeWins: number): number {
+  return GARDEN_SLOT_COUNTS.reduce<number>(
+    (count, stage) => lifetimeWins >= stage.unlockAt ? stage.count : count,
+    GARDEN_SLOT_COUNTS[0].count,
+  );
+}
+
+export function getGardenSlotIds(lifetimeWins: number): string[] {
+  return Array.from({ length: getUnlockedGardenSlotCount(lifetimeWins) }, (_, index) => `plot-${index + 1}`);
+}
+
+export function getPendingTreeSeeds(state: GameState): string[] {
+  return Object.values(state.days)
+    .filter((day) => day.dailyWin && !day.treeSeedClaimed)
+    .map((day) => day.dayKey)
+    .sort((left, right) => right.localeCompare(left));
+}
+
+export function isGardenSeedUnlocked(kind: GardenSeedKind, lifetimeWins: number, pendingTreeSeeds = 0): boolean {
+  if (kind === "tree") return pendingTreeSeeds > 0;
+  return lifetimeWins >= GARDEN_SEED_UNLOCKS[kind];
 }
 
 export function getMoodForDay(day: DailyState): MoodLevel {
@@ -97,6 +136,7 @@ export function getFlowStep(state: GameState, dayKey = getDayKey()): FlowStep {
   if (!state.hasSeenIntro) return "intro";
   if (target === 0) return "manage";
   if (!day.energyConfirmed) return "energy";
+  if (day.dailyWin && !day.treeSeedClaimed) return "plant";
   if (day.dailyWin) return day.rewardChoice ? "done" : "reward";
   return "tasks";
 }
@@ -118,6 +158,11 @@ export function getLongTermPlantStage(totalWins: number): PlantStage {
   if (totalWins >= 3) return "flower";
   if (totalWins >= 1) return "sprout";
   return "seed";
+}
+
+export function getDailyTreeSuggestion(dayKey = getDayKey()): GardenTreeVariant {
+  const variantIndex = hashValue(`tree:${dayKey}`) % GARDEN_TREE_VARIANTS.length;
+  return GARDEN_TREE_VARIANTS[variantIndex]?.id ?? "peach";
 }
 
 function isPlantStage(value: unknown): value is PlantStage {
@@ -154,9 +199,7 @@ export function recalculateStats(state: GameState): GameState {
   const lifetimeWins = Math.max(previousLifetimeWins, totalWins);
   const longTermStage = getLongTermPlantStage(lifetimeWins);
   const savedGardenStage = isPlantStage(state.gardenPlantStage) ? state.gardenPlantStage : "seed";
-  const gardenPlantStage = Object.values(state.days).some((day) => day.dailyWin)
-    ? "tree"
-    : getMoreMaturePlantStage(savedGardenStage, longTermStage);
+  const gardenPlantStage = getMoreMaturePlantStage(savedGardenStage, longTermStage);
   return {
     ...state,
     totalWins,
@@ -215,7 +258,6 @@ export function toggleQuest(
   return {
     state: recalculateStats({
       ...state,
-      gardenPlantStage: nextDay.dailyWin ? "tree" : state.gardenPlantStage,
       days: {
         ...state.days,
         [dayKey]: nextDay,
@@ -285,6 +327,136 @@ export function setTodayEnergy(
   dayKey = getDayKey(),
 ): GameState {
   return updateToday(state, (day) => ({ ...day, energy, energyConfirmed: true }), dayKey);
+}
+
+function makeGardenItemId(kind: GardenSeedKind, slotId: string): string {
+  const randomPart = typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return `garden-${kind}-${slotId}-${randomPart}`;
+}
+
+function isValidGardenSeedKind(kind: string): kind is GardenSeedKind {
+  return kind === "tree" || kind === "flower" || kind === "bush";
+}
+
+function isValidGardenSlot(slotId: string, lifetimeWins: number): boolean {
+  return getGardenSlotIds(lifetimeWins).includes(slotId);
+}
+
+function isGardenSlotTaken(items: readonly PlantedGardenItem[], slotId: string, ignoredItemId?: string): boolean {
+  return items.some((item) => item.slotId === slotId && item.id !== ignoredItemId);
+}
+
+export interface GardenMutationResult {
+  state: GameState;
+  blocked: boolean;
+  item?: PlantedGardenItem;
+}
+
+export function claimTreeSeed(state: GameState, dayKey = getDayKey()): GameState {
+  const day = getDayState(state, dayKey);
+  if (!day.dailyWin || day.treeSeedClaimed) return state;
+  return {
+    ...state,
+    days: {
+      ...state.days,
+      [dayKey]: { ...day, treeSeedClaimed: true },
+    },
+  };
+}
+
+export function plantGardenItem(
+  state: GameState,
+  kind: GardenSeedKind,
+  slotId: string,
+  sourceDayKey?: string,
+  treeVariant?: GardenTreeVariant,
+): GardenMutationResult {
+  const pendingTreeSeeds = getPendingTreeSeeds(state);
+  if (!isValidGardenSeedKind(kind)
+    || !isValidGardenSlot(slotId, state.lifetimeWins)
+    || isGardenSlotTaken(state.plantedItems, slotId)
+    || !isGardenSeedUnlocked(kind, state.lifetimeWins, pendingTreeSeeds.length)) {
+    return { state, blocked: true };
+  }
+
+  const resolvedSourceDayKey = kind === "tree"
+    ? (sourceDayKey && pendingTreeSeeds.includes(sourceDayKey) ? sourceDayKey : pendingTreeSeeds[0])
+    : sourceDayKey;
+  if (kind === "tree" && !resolvedSourceDayKey) return { state, blocked: true };
+
+  const resolvedTreeVariant = kind === "tree"
+    ? (isGardenTreeVariant(treeVariant)
+      ? treeVariant
+      : getDailyTreeSuggestion(resolvedSourceDayKey))
+    : undefined;
+
+  const item: PlantedGardenItem = {
+    id: makeGardenItemId(kind, slotId),
+    kind,
+    treeVariant: resolvedTreeVariant,
+    slotId,
+    plantedAt: Date.now(),
+    sourceDayKey: resolvedSourceDayKey,
+  };
+  const nextState = kind === "tree" && resolvedSourceDayKey
+    ? claimTreeSeed(state, resolvedSourceDayKey)
+    : state;
+
+  return {
+    state: {
+      ...nextState,
+      plantedItems: [...nextState.plantedItems, item],
+    },
+    blocked: false,
+    item,
+  };
+}
+
+export function moveGardenItem(state: GameState, itemId: string, slotId: string): GardenMutationResult {
+  const item = state.plantedItems.find((candidate) => candidate.id === itemId);
+  if (!item || !isValidGardenSlot(slotId, state.lifetimeWins) || isGardenSlotTaken(state.plantedItems, slotId, itemId)) {
+    return { state, blocked: true };
+  }
+
+  return {
+    state: {
+      ...state,
+      plantedItems: state.plantedItems.map((candidate) => candidate.id === itemId ? { ...candidate, slotId } : candidate),
+    },
+    blocked: false,
+    item: { ...item, slotId },
+  };
+}
+
+export function removeGardenItem(state: GameState, itemId: string): GardenMutationResult {
+  const item = state.plantedItems.find((candidate) => candidate.id === itemId);
+  if (!item) return { state, blocked: true };
+  return {
+    state: {
+      ...state,
+      plantedItems: state.plantedItems.filter((candidate) => candidate.id !== itemId),
+    },
+    blocked: false,
+    item,
+  };
+}
+
+export function restoreGardenItem(state: GameState, item: PlantedGardenItem): GardenMutationResult {
+  if (state.plantedItems.some((candidate) => candidate.id === item.id)
+    || !isValidGardenSlot(item.slotId, state.lifetimeWins)
+    || isGardenSlotTaken(state.plantedItems, item.slotId)) {
+    return { state, blocked: true };
+  }
+  return {
+    state: {
+      ...state,
+      plantedItems: [...state.plantedItems, item],
+    },
+    blocked: false,
+    item,
+  };
 }
 
 export function setTodayMood(
