@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getDailyAvatar } from "./lib/avatar";
 import { getDayKey, getPersianDateSummary, getPersianGreeting, getSkyPhase } from "./lib/date";
 import { toPersianDigits } from "./lib/format";
@@ -98,6 +98,21 @@ export default function App() {
     : gameState.profile.theme;
 
   useBodyScrollLock(isDrawerOpen);
+
+  useLayoutEffect(() => {
+    const historyState = window.history;
+    const previousScrollRestoration = historyState.scrollRestoration;
+    historyState.scrollRestoration = "manual";
+
+    const resetScroll = () => window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    resetScroll();
+    const frame = window.requestAnimationFrame(resetScroll);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      historyState.scrollRestoration = previousScrollRestoration;
+    };
+  }, []);
 
   useEffect(() => {
     saveGameState(gameState);
